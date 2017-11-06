@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,15 +20,17 @@ public class Vvishcontroller {
 	@Autowired
 	VVishService vVService;
 	
-	@GetMapping(value = "/generate", 
+	/*@GetMapping(value = "/generate", 
 			produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<String> getUserVideos(@RequestParam String groupId) {
 		return vVService.generateVideo(groupId);
-	}
+	}*/
 	@PostMapping(value = "/generateVideo/{userId}/{groupId}", 
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
-	public  String[] getUserSelectedVideos(@RequestBody String[] mediaFiles) {
+	public  String[] getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody String[] mediaFiles) {
+		vVService.generateVideo(groupId, userId, mediaFiles);
+		
 		return mediaFiles;	
 	}
 }

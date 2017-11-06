@@ -1,12 +1,16 @@
 package com.appdev.vvish.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +39,7 @@ public class VideoStitchingService {
 		FFmpeg ffmpeg = new FFmpeg("./lib/ffmpeg");
 		FFprobe ffprobe = new FFprobe("./lib/ffprobe");
                 FFmpegFormat ffformat = new FFmpegFormat();
-		ffformat.duration = 2;
+		ffformat.duration = 4;
 		FFmpegBuilder builder = new FFmpegBuilder();
                 FFmpegBuilder builder2 = new FFmpegBuilder();
 	
@@ -54,23 +58,23 @@ public class VideoStitchingService {
         .setVideoFrameRate(24,1).done();
 					
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-		executor.createJob(builder).run();
+		//executor.createJob(builder).run();
             // executor.createJob(builder2).run();
             
-           double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
-                System.err.println("duration is "+duration);
+          /* double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
+                System.err.println("duration is "+duration);*/
 		
-            convertImage(duration);
+            convertImage(2);
          // ffmpeg -stream_loop -1 -i input.mp4 -c copy -fflags +genpts output.mp4 
          
          //Final job- Overlay
-            String cmd[] = new String[]{
+            /*String cmd[] = new String[]{
                 "ffmpeg",
 			"-i", "./tmp/img_video.mp4",
 			"-i", "./tmp/output.mp4", "-filter_complex" ,
-        "[0:v][1:v]overlay","-pix_fmt", "yuv420p" ,"./tmp/final_video.mp4"};
+        "[0:v][1:v]overlay","-pix_fmt", "yuv420p" ,"./tmp/final_video.mp4"};*/
             
-            commandProcess(cmd);          
+         //   commandProcess(cmd);          
 
 	}
         
@@ -127,8 +131,8 @@ public class VideoStitchingService {
 //        "-pix_fmt", "yuv420p",
 //"./tmp/img_video.mp4"};
      
-     String cmd[] = new String[]{
-                "ffmpeg", "-r","1/2","-f", "concat",
+        String cmd[] = new String[]{
+                "./lib/ffmpeg", "-r","1/2","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
 			"-i", "./tmp/images_list.txt",
 			"-c:v", "libx264", "-r","80" ,
         "-pix_fmt", "yuv420p",
@@ -193,4 +197,18 @@ public class VideoStitchingService {
 
             System.out.println(outputJson);
     }
+    public void createMediaTextFile(String[] mediaFiles) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+    	
+    	File file = new File("tmp/images_list.txt");
+    	FileWriter fileWriter = new FileWriter(file, false); 
+    	
+    	for(String eachFile:mediaFiles) {
+    		fileWriter.write("file "+eachFile+System.getProperty( "line.separator" ));
+    		fileWriter.write("duration 2"+System.getProperty( "line.separator" ));
+    	}
+    	fileWriter.close();
+    	
+    	
+    }
+
 }
