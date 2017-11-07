@@ -1,0 +1,1 @@
+file 'img1.jpg' duration 2 file 'img2.jpg' duration 2 file 'img3.jpg' duration 2
