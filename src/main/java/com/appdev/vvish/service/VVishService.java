@@ -13,6 +13,9 @@ import com.appdev.vvish.dao.FirebaseConnector;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
 
 @Service
@@ -50,6 +53,17 @@ public class VVishService {
 		
 		return null;
 	}
-	
-	
+//	public ResponseEntity<String> generatefilter(String type) {
+//		
+//	Firebase ref = new Firebase("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf");
+//			ref.orderByChild("type").equalTo("Capsule");
+//			        ref.addChildEventListener(new ChildEventListener() {
+//			            @Override
+//			            public void onChildAdded(DataSnapshot dataSnapshot,  String s) {
+//			                Object ob = dataSnapshot.getValue();
+//			                System.out.println("There are " + dataSnapshot.getKey() + " blog posts==" + dataSnapshot.getValue());
+//			            }
+//
+//					
+//			 });
 }

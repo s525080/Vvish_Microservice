@@ -33,4 +33,14 @@ public class Vvishcontroller {
 		
 		return mediaFiles;	
 	}
+	
+	//trial
+	@GetMapping(value = "/generate", 
+			produces =  MediaType.TEXT_PLAIN_VALUE)
+	public  String getUser2() {
+		return "RETURN";	
+	}
+	
+	
+	
 }
