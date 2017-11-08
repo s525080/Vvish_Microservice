@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.aopalliance.intercept.Invocation;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -47,6 +49,7 @@ public class TestGroupModel {
 
 	public  ArrayList<JSONObject> sortbyType(JSONObject json) {
 		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+		ArrayList<JSONObject> finalList=new ArrayList<JSONObject>();
 
 		ArrayList<JSONObject> supriseList=new ArrayList<JSONObject>();
 		ArrayList<JSONObject> memoriesList=new ArrayList<JSONObject>();
@@ -61,33 +64,106 @@ public class TestGroupModel {
 			log.info( "value :"+value);
 			Set<String> userSet = value.keySet();
 			log.info( "userSet :"+userSet);
-			
+
 			for(String userKey:userSet) { 
 				log.info( "userKey :"+userKey);
-				JSONObject userValue= (JSONObject) obj.get(key);
+				JSONObject userValue= (JSONObject) value.get(userKey);
 				log.info( "userValue :"+userValue);
+				//log.info( "userValue :"+userVal);
 				Set<String> groupKeys = userValue.keySet();
-				
+
+
 				for(String groupKey:groupKeys) {
 					log.info( "groupKey :"+groupKey);
-					String groupValue=  (String) obj.get(groupKey);
-					log.info( "groupValue :"+groupValue);
-					
-					//Set<String> internalKeys = groupValue.keySet();
-					
-//					for(String content:internalKeys) { 
-//						
-//						log.info( "content :"+content);
-//						if (content.equalsIgnoreCase("type")) {
-//							log.info( "entered content:"+content);
-//						}
-//					}
-				}
-			}
-		}
 
+					//					String groupValue=(String) userValue.get(groupKey);
+					//					log.info( "groupValue :"+groupValue);
+
+					//groupKey.equalsIgnoreCase("role")&& userValue.get(groupKey).toString().equalsIgnoreCase("Owner")
+					if (groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Memories") ) {
+						log.info( "entered content:"+groupKey);
+						memoriesList.add(userValue);
+						typeList=getOwnerList(memoriesList);
+						finalList=memoriesFilterByDate(typeList);
+					}else if(groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Surprise")) {
+						supriseList.add(userValue);
+						typeList=getOwnerList(supriseList);
+						memoriesFilterByDate(typeList);
+						finalList=surpriseFilterByDate(typeList);
+					}else if(groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Capsule")) {
+						capsuleList.add(userValue);
+						typeList=getOwnerList(capsuleList);
+					}
+
+				}
+			}			
+
+		}
+	//	log.info("currentDate :"+sysdate);
+		log.info("memoriesList :"+memoriesList.size());
+		log.info("supriseList :"+supriseList.size());
+		log.info("capsuleList :"+capsuleList.size());
+		log.info("typeList :"+typeList.size());
 		return typeList;
 	}
+
+
+	private ArrayList<JSONObject> surpriseFilterByDate(ArrayList<JSONObject> list) {
+		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+
+		for(JSONObject capsules:list) {
+			Set<String> groupKeys = capsules.keySet();
+			for(String groupKey:groupKeys) {
+				log.info( "groupKey :"+groupKey);
+				 Calendar calendar = Calendar.getInstance();
+				 log.info(""+calendar.getTimeInMillis());
+//				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
+//					log.info( "entered content:"+groupKey);
+//					typeList.add(capsules);
+//				}
+			}
+		}	
+		return typeList;
+	}
+
+	private ArrayList<JSONObject> memoriesFilterByDate(ArrayList<JSONObject> list) {
+		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+
+		for(JSONObject capsules:list) {
+			Set<String> groupKeys = capsules.keySet();
+			for(String groupKey:groupKeys) {
+				log.info( "groupKey :"+groupKey);
+				 Calendar calendar = Calendar.getInstance();
+				 log.info(""+calendar.getTimeInMillis());
+//				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey) ) {
+//					log.info( "entered content:"+groupKey);
+//					typeList.add(capsules);
+//				}
+			}
+		}	
+		return typeList;
+	}
+
+	public ArrayList<JSONObject> getOwnerList(ArrayList<JSONObject> list) {
+		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+
+		for(JSONObject capsules:list) {
+			Set<String> groupKeys = capsules.keySet();
+			for(String groupKey:groupKeys) {
+				log.info( "groupKey :"+groupKey);
+				 Calendar calendar = Calendar.getInstance();
+				 log.info(""+calendar.getTimeInMillis());
+//				if (groupKey.equalsIgnoreCase("role")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
+//					log.info( "entered content:"+groupKey);
+//					typeList.add(capsules);
+//				}
+			}
+		}	
+		return typeList;
+	}
+
+	
+
 	public JSONObject Staticmethod() throws  UniformInterfaceException,  IOException, ParseException {
 
 		Client client = Client.create();
