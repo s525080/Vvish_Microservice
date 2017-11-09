@@ -3,6 +3,8 @@ package com.appdev.vvish;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -32,19 +34,44 @@ import com.sun.jersey.api.client.WebResource;
 
 public class TestGroupModel {
 	final Logger log = LoggerFactory.getLogger(FirebaseConnector.class);
-
+	final Calendar cal = Calendar.getInstance();
+	 final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	 
 	public static void main(String[] args)  {
 		// TODO Auto-generated method stub
-		TestGroupModel tgm=new TestGroupModel();
+		TestGroupModel callClient=new TestGroupModel();
+		   
 		JSONObject json=null;
 		try {
-			json=tgm.Staticmethod();			
+			json=callClient.callgetMethod();	
+			callClient.callpostMethod();
+			callClient.callputMethod();
+			callClient.calldeleteMethod();
 		} catch (ClientHandlerException | UniformInterfaceException |  IOException | ParseException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ArrayList<JSONObject> typeList=tgm.sortbyType(json);
+		ArrayList<JSONObject> typeList=callClient.sortbyType(json);
 
+	}
+
+	private void calldeleteMethod() {
+		// TODO Auto-generated method stub
+	Client client = Client.create();	
+	WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
+		//String location = "https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
+	ClientResponse response = webResource.type("application/json").accept("application/json")
+				.delete(ClientResponse.class); 
+	}
+
+	private void callputMethod() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void callpostMethod() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public  ArrayList<JSONObject> sortbyType(JSONObject json) {
@@ -115,12 +142,13 @@ public class TestGroupModel {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				 Calendar calendar = Calendar.getInstance();
-				 log.info(""+calendar.getTimeInMillis());
-//				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
-//					log.info( "entered content:"+groupKey);
-//					typeList.add(capsules);
-//				}
+				 cal.add(Calendar.DATE, -1);
+				String deliveryDate= dateFormat.format(cal.getTime());
+				  log.info("yesterday date  :"+ dateFormat.format(cal.getTime()));
+				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase(deliveryDate) ) {
+					log.info( "entered content:"+groupKey);
+					typeList.add(capsules);
+				}
 			}
 		}	
 		return typeList;
@@ -133,12 +161,14 @@ public class TestGroupModel {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				 Calendar calendar = Calendar.getInstance();
-				 log.info(""+calendar.getTimeInMillis());
-//				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey) ) {
-//					log.info( "entered content:"+groupKey);
-//					typeList.add(capsules);
-//				}
+				 
+				  cal.add(Calendar.DATE, +2);
+				  String deliveryDate =dateFormat.format(cal.getTime());
+				  log.info("tomorrow date  :"+ dateFormat.format(cal.getTime()));
+				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase(deliveryDate) ) {
+					log.info( "entered content:"+groupKey);
+					typeList.add(capsules);
+				}
 			}
 		}	
 		return typeList;
@@ -151,12 +181,11 @@ public class TestGroupModel {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				 Calendar calendar = Calendar.getInstance();
-				 log.info(""+calendar.getTimeInMillis());
-//				if (groupKey.equalsIgnoreCase("role")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
-//					log.info( "entered content:"+groupKey);
-//					typeList.add(capsules);
-//				}
+				
+				if (groupKey.equalsIgnoreCase("role")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
+					log.info( "entered content:"+groupKey);
+					typeList.add(capsules);
+				}
 			}
 		}	
 		return typeList;
@@ -164,21 +193,16 @@ public class TestGroupModel {
 
 	
 
-	public JSONObject Staticmethod() throws  UniformInterfaceException,  IOException, ParseException {
+	public JSONObject callgetMethod() throws  UniformInterfaceException,  IOException, ParseException {
 
 		Client client = Client.create();
-		// For URL Add Connector Name/Delete
+		
 		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
 
 		//String location = "https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
 		ClientResponse response = webResource.type("application/json").accept("application/json")
-				.get(ClientResponse.class); // Getting status & tasks for a connector demo-connector/status
-
-		//	log.info( "response :    "+response.getEntity(String.class));
+				.get(ClientResponse.class); 
 		log.info( "responseStatus :"+response.getStatus());
-		//log.info( "response :"+response.getEntity(GroupTest.class));
-
-		//StringBuilder output=new StringBuilder();
 		String output=response.getEntity(String.class);
 		log.info( "response :    "+output);
 		JSONParser parser = new JSONParser(); 
