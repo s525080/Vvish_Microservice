@@ -49,15 +49,15 @@ public class TestGroupModel {
 		JSONObject json=null;
 		try {
 			json=callClient.callgetMethod();	
-			callClient.callpostMethod();
-			callClient.callputMethod();
+			String output=callClient.callpostMethod(json);
+			
 			//callClient.calldeleteMethod();
 		} catch (ClientHandlerException | UniformInterfaceException |  IOException | ParseException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		ArrayList<JSONObject> typeList=callClient.sortbyType(json, memoriesDate, surpriseDate);
-
+		String putOutput=callClient.callputMethod(typeList);
 	}
 
 	private void calldeleteMethod() {
@@ -69,15 +69,40 @@ public class TestGroupModel {
 				.delete(ClientResponse.class); 
 	}
 
-	private void callputMethod() {
+	private String callputMethod(ArrayList<JSONObject> typeList) {
 		// TODO Auto-generated method stub
+		ArrayList<String> responses=new ArrayList<String>();
+		for(JSONObject input:typeList) {
+		ClientResponse response = null;
 
+		Client client = Client.create();
+		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");		
+			response = webResource.type("application/json").accept("application/json").put(ClientResponse.class, typeList.toString());
+				if (response.getStatus() != 201) {
+					throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+				}
+				
+				responses.add(response.getEntity(String.class));
+		}
+			return responses.toString();
 	}
 
-	private void callpostMethod() {
+	private String callpostMethod(JSONObject inputJSON) {
 		// TODO Auto-generated method stub
+		ClientResponse response = null;
 
-	}
+		Client client = Client.create();
+		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
+		
+		
+				response = webResource.type("application/json").accept("application/json").post(ClientResponse.class, inputJSON.toString());
+				if (response.getStatus() != 201) {
+					throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+				}
+			
+			return response.getEntity(String.class);
+		}
+	
 
 	public  ArrayList<JSONObject> sortbyType(JSONObject json,String surpriseDate, String memoriesDate) {
 		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
@@ -111,7 +136,6 @@ public class TestGroupModel {
 
 					//					String groupValue=(String) userValue.get(groupKey);
 					//					log.info( "groupValue :"+groupValue);
-
 					//groupKey.equalsIgnoreCase("role")&& userValue.get(groupKey).toString().equalsIgnoreCase("Owner")
 					if (groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Memories") ) {
 						log.info( "entered content:"+groupKey);
