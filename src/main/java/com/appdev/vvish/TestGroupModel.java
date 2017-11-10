@@ -42,10 +42,10 @@ public class TestGroupModel {
 		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		cal.add(Calendar.DATE, -1);
 		 String surpriseDate=dateFormat.format(cal.getTime()).substring(0, 10);
-		 System.out.println(surpriseDate);
+		 System.out.println("Yesterday"+surpriseDate);
 		cal.add(Calendar.DATE, +3);
 		 String memoriesDate =dateFormat.format(cal.getTime()).substring(0, 10);
-		 System.out.println(memoriesDate);
+		 System.out.println("tomorrow :"+memoriesDate);
 		JSONObject json=null;
 		try {
 			json=callClient.callgetMethod();	
@@ -81,7 +81,7 @@ public class TestGroupModel {
 				if (response.getStatus() != 201) {
 					throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
 				}
-				
+				    
 				responses.add(response.getEntity(String.class));
 		}
 			return responses.toString();
