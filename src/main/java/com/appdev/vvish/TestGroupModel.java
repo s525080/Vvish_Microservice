@@ -34,54 +34,60 @@ import com.sun.jersey.api.client.WebResource;
 
 public class TestGroupModel {
 	final Logger log = LoggerFactory.getLogger(FirebaseConnector.class);
-	final Calendar cal = Calendar.getInstance();
-	 final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	 
+	
 	public static void main(String[] args)  {
 		// TODO Auto-generated method stub
 		TestGroupModel callClient=new TestGroupModel();
-		   
+		Calendar cal = Calendar.getInstance();
+		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		cal.add(Calendar.DATE, -1);
+		 String surpriseDate=dateFormat.format(cal.getTime()).substring(0, 10);
+		 System.out.println(surpriseDate);
+		cal.add(Calendar.DATE, +3);
+		 String memoriesDate =dateFormat.format(cal.getTime()).substring(0, 10);
+		 System.out.println(memoriesDate);
 		JSONObject json=null;
 		try {
 			json=callClient.callgetMethod();	
 			callClient.callpostMethod();
 			callClient.callputMethod();
-			callClient.calldeleteMethod();
+			//callClient.calldeleteMethod();
 		} catch (ClientHandlerException | UniformInterfaceException |  IOException | ParseException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ArrayList<JSONObject> typeList=callClient.sortbyType(json);
+		ArrayList<JSONObject> typeList=callClient.sortbyType(json, memoriesDate, surpriseDate);
 
 	}
 
 	private void calldeleteMethod() {
 		// TODO Auto-generated method stub
-	Client client = Client.create();	
-	WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
+		Client client = Client.create();	
+		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
 		//String location = "https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
-	ClientResponse response = webResource.type("application/json").accept("application/json")
+		ClientResponse response = webResource.type("application/json").accept("application/json")
 				.delete(ClientResponse.class); 
 	}
 
 	private void callputMethod() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void callpostMethod() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	public  ArrayList<JSONObject> sortbyType(JSONObject json) {
+	public  ArrayList<JSONObject> sortbyType(JSONObject json,String surpriseDate, String memoriesDate) {
 		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
 		ArrayList<JSONObject> finalList=new ArrayList<JSONObject>();
 
 		ArrayList<JSONObject> supriseList=new ArrayList<JSONObject>();
 		ArrayList<JSONObject> memoriesList=new ArrayList<JSONObject>();
 		ArrayList<JSONObject> capsuleList=new ArrayList<JSONObject>();
-
+		log.info("memoriesDate date  :"+ memoriesDate);
+		log.info("surpriseDate date  :"+ surpriseDate);
 		JSONObject obj = new JSONObject(json);
 		Set<String> set = obj.keySet();
 		//String key = null;
@@ -111,12 +117,13 @@ public class TestGroupModel {
 						log.info( "entered content:"+groupKey);
 						memoriesList.add(userValue);
 						typeList=getOwnerList(memoriesList);
-						finalList=memoriesFilterByDate(typeList);
+						finalList=memoriesFilterByDate(typeList, memoriesDate);
+						
 					}else if(groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Surprise")) {
 						supriseList.add(userValue);
 						typeList=getOwnerList(supriseList);
-						memoriesFilterByDate(typeList);
-						finalList=surpriseFilterByDate(typeList);
+					//	memoriesFilterByDate(typeList);
+						finalList=surpriseFilterByDate(typeList, surpriseDate);
 					}else if(groupKey.equalsIgnoreCase("type")&& userValue.get(groupKey).toString().equalsIgnoreCase("Capsule")) {
 						capsuleList.add(userValue);
 						typeList=getOwnerList(capsuleList);
@@ -126,7 +133,7 @@ public class TestGroupModel {
 			}			
 
 		}
-	//	log.info("currentDate :"+sysdate);
+		//	log.info("currentDate :"+sysdate);
 		log.info("memoriesList :"+memoriesList.size());
 		log.info("supriseList :"+supriseList.size());
 		log.info("capsuleList :"+capsuleList.size());
@@ -135,17 +142,17 @@ public class TestGroupModel {
 	}
 
 
-	private ArrayList<JSONObject> surpriseFilterByDate(ArrayList<JSONObject> list) {
+	private ArrayList<JSONObject> surpriseFilterByDate(ArrayList<JSONObject> list,String surpriseDate) {
 		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
 
 		for(JSONObject capsules:list) {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				 cal.add(Calendar.DATE, -1);
-				String deliveryDate= dateFormat.format(cal.getTime());
-				  log.info("yesterday date  :"+ dateFormat.format(cal.getTime()));
-				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase(deliveryDate) ) {
+
+				
+			//	log.info("yesterday date  :"+ dateFormat.format(cal.getTime()));
+				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().substring(0, 10).equalsIgnoreCase(surpriseDate) ) {
 					log.info( "entered content:"+groupKey);
 					typeList.add(capsules);
 				}
@@ -154,18 +161,17 @@ public class TestGroupModel {
 		return typeList;
 	}
 
-	private ArrayList<JSONObject> memoriesFilterByDate(ArrayList<JSONObject> list) {
+	private ArrayList<JSONObject> memoriesFilterByDate(ArrayList<JSONObject> list,String memoriesDate) {
 		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
 
 		for(JSONObject capsules:list) {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				 
-				  cal.add(Calendar.DATE, +2);
-				  String deliveryDate =dateFormat.format(cal.getTime());
-				  log.info("tomorrow date  :"+ dateFormat.format(cal.getTime()));
-				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().equalsIgnoreCase(deliveryDate) ) {
+
+
+				
+				if (groupKey.equalsIgnoreCase("todate")&& capsules.get(groupKey).toString().substring(0, 10).equalsIgnoreCase(memoriesDate) ) {
 					log.info( "entered content:"+groupKey);
 					typeList.add(capsules);
 				}
@@ -181,7 +187,7 @@ public class TestGroupModel {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				log.info( "groupKey :"+groupKey);
-				
+
 				if (groupKey.equalsIgnoreCase("role")&& capsules.get(groupKey).toString().equalsIgnoreCase("Owner") ) {
 					log.info( "entered content:"+groupKey);
 					typeList.add(capsules);
@@ -191,12 +197,12 @@ public class TestGroupModel {
 		return typeList;
 	}
 
-	
+
 
 	public JSONObject callgetMethod() throws  UniformInterfaceException,  IOException, ParseException {
 
 		Client client = Client.create();
-		
+
 		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
 
 		//String location = "https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
