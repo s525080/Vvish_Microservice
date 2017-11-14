@@ -57,11 +57,7 @@ public class VVishService {
 		return null;
 	}
 	
-	
-	
-
-	
-	public String generateSurpriseVideoFromFinalList(String key, String userKey, ArrayList<JSONObject> finalList) throws ParseException {
+	public String generateSurpriseVideoFromFinalList(String key, String userKey, java.util.List<JSONObject> finalList) throws ParseException {
 		// TODO Auto-generated method stub
 		ArrayList<String> mediaList=new ArrayList<String>();
 
@@ -79,12 +75,12 @@ public class VVishService {
 		String url=generateVideo(key, userKey, mediaFiles);
 		System.out.println("Generated video ");
 		System.out.println("Before PUT:" +key+"userKey :"+userKey+"URL :"+url);
-		String output = dbConnector.callputMethod(key, userKey, url);
+		String output = dbConnector.insertVideoUrl(key, userKey, url);
 		System.out.println("URL"+url);
 		return output;
 	}
 
-	public String generateMemoriesVideoFromFinalList(String key, String userKey, ArrayList<JSONObject> finalList) throws ParseException {
+	public String generateMemoriesVideoFromFinalList(String key, String userKey, java.util.List<JSONObject> finalList) throws ParseException {
 		// TODO Auto-generated method stub
 		ArrayList<String> mediaList=new ArrayList<String>();
 
@@ -109,7 +105,7 @@ public class VVishService {
 		String url=generateVideo(key, userKey, mediaFiles);
 		System.out.println("Generated video ");
 		System.out.println("Before PUT:" +key+"userKey :"+userKey+"URL :"+url);
-		String output = dbConnector.callputMethod(key, userKey, url);
+		String output = dbConnector.insertVideoUrl(key, userKey, url);
 		System.out.println("URL"+url);
 		return output;
 	}

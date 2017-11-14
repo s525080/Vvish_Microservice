@@ -40,36 +40,56 @@ public class DBConnector {
 	
 	public JSONObject fetchGroups() throws  UniformInterfaceException,  IOException, ParseException {
 
-		Client client = Client.create();
-		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
-		ClientResponse response = webResource.type("application/json").accept("application/json")
-				.get(ClientResponse.class); 
+		ClientResponse response = getGetResponse(); 
 		log.info( "responseStatus :"+response.getStatus());
 		String output=response.getEntity(String.class);
 		response=null;
+		JSONObject json = parseGetResponse(output);
+
+		Calendar cal = Calendar.getInstance();
+		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String surpriseDate = getSurpriseDate(cal, dateFormat);
+		String memoriesDate = getMemoriesDate(cal, dateFormat);
+		sortbyType(json, memoriesDate, surpriseDate);
+		return json;
+	}
+
+	private String getMemoriesDate(Calendar cal, final DateFormat dateFormat) {
+		cal.add(Calendar.DATE, +3);
+		String memoriesDate =dateFormat.format(cal.getTime()).substring(0, 10);
+		System.out.println("memoriesDate :"+memoriesDate);
+		return memoriesDate;
+	}
+
+	private String getSurpriseDate(Calendar cal, final DateFormat dateFormat) {
+		cal.add(Calendar.DATE, -1);
+		String surpriseDate=dateFormat.format(cal.getTime()).substring(0, 10);
+		System.out.println("surpriseDate"+surpriseDate);
+		return surpriseDate;
+	}
+
+	private JSONObject parseGetResponse(String output) throws ParseException {
 		log.info( "response :    "+output);
 		JSONParser parser = new JSONParser(); 
 		JSONObject json = (JSONObject) parser.parse(output);
 		log.info("json"+json.toString());
-
-		Calendar cal = Calendar.getInstance();
-		final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		cal.add(Calendar.DATE, -1);
-		String surpriseDate=dateFormat.format(cal.getTime()).substring(0, 10);
-		System.out.println("surpriseDate"+surpriseDate);
-		cal.add(Calendar.DATE, +3);
-		String memoriesDate =dateFormat.format(cal.getTime()).substring(0, 10);
-		System.out.println("memoriesDate :"+memoriesDate);
-		sortbyType(json, memoriesDate, surpriseDate);
 		return json;
+	}
+
+	private ClientResponse getGetResponse() {
+		Client client = Client.create();
+		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
+		ClientResponse response = webResource.type("application/json").accept("application/json")
+				.get(ClientResponse.class);
+		return response;
 	}
 	
 	public  String sortbyType(JSONObject json,String memoriesDate, String surpriseDate) throws ParseException {
 
-		ArrayList<JSONObject> supriseList=new ArrayList<JSONObject>();
-		ArrayList<JSONObject> memoriesList=new ArrayList<JSONObject>();
-		ArrayList<JSONObject> capsuleList=new ArrayList<JSONObject>();
-		ArrayList<JSONObject> finalCapsuleList=new ArrayList<JSONObject>();
+		List<JSONObject> supriseList=new ArrayList<JSONObject>();
+		List<JSONObject> memoriesList=new ArrayList<JSONObject>();
+		List<JSONObject> capsuleList=new ArrayList<JSONObject>();
+		List<JSONObject> finalCapsuleList=new ArrayList<JSONObject>();
 		String memoriesresponse;
 		String surpriseresponse;
 		log.info("memoriesDate date  :"+ memoriesDate);
@@ -148,10 +168,10 @@ public class DBConnector {
 		return response.getEntity(String.class);
 	}
 
-	private String fileterSuprises(ArrayList<JSONObject> surpriseList, String key, String userKey,String surpriseDate ) throws ParseException {
+	private String fileterSuprises(List<JSONObject> surpriseList, String key, String userKey,String surpriseDate ) throws ParseException {
 		// TODO Auto-generated method stub
-		ArrayList<JSONObject> surpriseTypeList=new ArrayList<JSONObject>();		
-		ArrayList<JSONObject> finalList=new ArrayList<JSONObject>();
+		List<JSONObject> surpriseTypeList=new ArrayList<JSONObject>();		
+		List<JSONObject> finalList=new ArrayList<JSONObject>();
 		String	output="No Owner for particular Date";
 		int surpriseTypeListSize=surpriseTypeList.size();
 		surpriseTypeList=surpriseFilterByDate( surpriseList,surpriseDate);
@@ -171,10 +191,10 @@ public class DBConnector {
 		return output;
 	}
 
-	private String filterMemories(ArrayList<JSONObject> memoriesList, String key, String userKey,String memoriesDate) throws ParseException {
+	private String filterMemories(List<JSONObject> memoriesList, String key, String userKey,String memoriesDate) throws ParseException {
 		// TODO Auto-generated method stub
-		ArrayList<JSONObject> memoriesTypeList=new ArrayList<JSONObject>();
-		ArrayList<JSONObject> finalList=new ArrayList<JSONObject>();
+		List<JSONObject> memoriesTypeList=new ArrayList<JSONObject>();
+		List<JSONObject> finalList=new ArrayList<JSONObject>();
 		String	output="No Owner for particular date";
 		int memoriesTypeListSize= memoriesTypeList.size();
 		memoriesTypeList=memoriesFilterByDate(memoriesList, memoriesDate);
@@ -192,8 +212,8 @@ public class DBConnector {
 
 	}
 	
-	public ArrayList<JSONObject> getOwnerList(ArrayList<JSONObject> inputlist) {
-		ArrayList<JSONObject> ownerList=new ArrayList<JSONObject>();
+	public List<JSONObject> getOwnerList(List<JSONObject> inputlist) {
+		List<JSONObject> ownerList=new ArrayList<JSONObject>();
 
 		for(JSONObject capsules:inputlist) {
 			Set<String> groupKeys = capsules.keySet();
@@ -208,8 +228,8 @@ public class DBConnector {
 		}	
 		return ownerList;
 	}
-	private ArrayList<JSONObject> memoriesFilterByDate(ArrayList<JSONObject> list,String memoriesDate) {
-		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+	private List<JSONObject> memoriesFilterByDate(List<JSONObject> list,String memoriesDate) {
+		List<JSONObject> typeList=new ArrayList<JSONObject>();
 
 		for(JSONObject capsules:list) {
 			Set<String> groupKeys = capsules.keySet();
@@ -224,8 +244,8 @@ public class DBConnector {
 		return typeList;
 	}
 
-	private ArrayList<JSONObject> surpriseFilterByDate(ArrayList<JSONObject> list,String surpriseDate) {
-		ArrayList<JSONObject> typeList=new ArrayList<JSONObject>();
+	private List<JSONObject> surpriseFilterByDate(List<JSONObject> list,String surpriseDate) {
+		List<JSONObject> typeList=new ArrayList<JSONObject>();
 		for(JSONObject capsules:list) {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
