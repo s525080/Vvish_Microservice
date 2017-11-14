@@ -35,6 +35,8 @@ import com.appdev.vvish.model.GroupUser;
 @Component
 @Configuration
 public class DBConnector {
+	public static final String FIREBASE_URL = "https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
+	public static final String MEDIA_TYPE = "application/json";
 	VVishService service;
 	Logger log = LoggerFactory.getLogger(DBConnector.class);
 	
@@ -78,8 +80,8 @@ public class DBConnector {
 
 	private ClientResponse getGetResponse() {
 		Client client = Client.create();
-		WebResource webResource = client.resource("https://vvish-new.firebaseio.com/Groups.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a");
-		ClientResponse response = webResource.type("application/json").accept("application/json")
+		WebResource webResource = client.resource(FIREBASE_URL);
+		ClientResponse response = webResource.type(MEDIA_TYPE).accept(MEDIA_TYPE)
 				.get(ClientResponse.class);
 		return response;
 	}
@@ -144,14 +146,14 @@ public class DBConnector {
 		ClientResponse response = null;
 		WebResource webResource=null;
 		String input="\""+finalVideo+"\"";
-		System.out.println("input :"+input);
+		log.info("input :"+input);
 		client = Client.create();
 		String inputURL="https://vvish-new.firebaseio.com/Groups/"+userId+"/"+groupId+"/finalVideo.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
-		System.out.println("inputURL :"+inputURL);
-		webResource = client.resource(inputURL);		
+		log.info("inputURL :"+inputURL);
+		webResource = client.resource(inputURL);
 		response = webResource.type("application/json").accept("text/html").put(ClientResponse.class,input );
 		String responses=response.getEntity(String.class);
-		System.out.println("after put :"+responses);
+		log.info("after put : :"+responses);
 		return responses;
 	}
 
@@ -169,8 +171,7 @@ public class DBConnector {
 	}
 
 	private String fileterSuprises(List<JSONObject> surpriseList, String key, String userKey,String surpriseDate ) throws ParseException {
-		// TODO Auto-generated method stub
-		List<JSONObject> surpriseTypeList=new ArrayList<JSONObject>();		
+		List<JSONObject> surpriseTypeList=new ArrayList<JSONObject>();
 		List<JSONObject> finalList=new ArrayList<JSONObject>();
 		String	output="No Owner for particular Date";
 		int surpriseTypeListSize=surpriseTypeList.size();
