@@ -1,13 +1,12 @@
 package com.appdev.vvish.service;
 
+import com.appdev.vvish.model.VideoCategory;
+import com.appdev.vvish.model.VideoDetails;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import com.appdev.vvish.model.VideoCategory;
-import com.appdev.vvish.model.VideoDetails;
 
 @Service
 public class UserVideosRenderingService {
