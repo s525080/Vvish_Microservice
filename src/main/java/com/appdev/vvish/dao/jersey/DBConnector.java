@@ -56,6 +56,22 @@ public class DBConnector {
 		return json;
 	}
 
+	public String insertVideoUrl(String userId, String groupId, String finalVideo) throws ParseException {
+		Client client =null;
+		ClientResponse response = null;
+		WebResource webResource=null;
+		String input="\""+finalVideo+"\"";
+		log.info("input :"+input);
+		client = Client.create();
+		String inputURL="https://vvish-new.firebaseio.com/Groups/"+userId+"/"+groupId+"/finalVideo.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
+		log.info("inputURL :"+inputURL);
+		webResource = client.resource(inputURL);
+		response = webResource.type("application/json").accept("text/html").put(ClientResponse.class,input );
+		String responses=response.getEntity(String.class);
+		log.info("after put : :"+responses);
+		return responses;
+	}
+
 	private String getMemoriesDate(Calendar cal, final DateFormat dateFormat) {
 		cal.add(Calendar.DATE, +3);
 		String memoriesDate =dateFormat.format(cal.getTime()).substring(0, 10);
@@ -141,21 +157,7 @@ public class DBConnector {
 
 		return "Final URL is obtained" ;
 	}
-	public String insertVideoUrl(String userId, String groupId, String finalVideo) throws ParseException {
-		Client client =null;
-		ClientResponse response = null;
-		WebResource webResource=null;
-		String input="\""+finalVideo+"\"";
-		log.info("input :"+input);
-		client = Client.create();
-		String inputURL="https://vvish-new.firebaseio.com/Groups/"+userId+"/"+groupId+"/finalVideo.json?auth=c42gihQ8uqKMNdlzbYi3xYMiBJL5l2ROSrklrf2a";
-		log.info("inputURL :"+inputURL);
-		webResource = client.resource(inputURL);
-		response = webResource.type("application/json").accept("text/html").put(ClientResponse.class,input );
-		String responses=response.getEntity(String.class);
-		log.info("after put : :"+responses);
-		return responses;
-	}
+
 
 
 
@@ -180,7 +182,7 @@ public class DBConnector {
 			System.out.println("System.out.println(surpriseTypeList.size());"+surpriseTypeList.size());
 		
 			finalList=getOwnerList(surpriseTypeList);
-		//	finalList=surpriseFilterByDate( surpriseTypeList,surpriseDate);
+			finalList=surpriseFilterByDate( surpriseTypeList,surpriseDate);
 			int finalsurpriseListSize=finalList.size();
 			if(finalList.size()>finalsurpriseListSize) {
 				System.out.println("surprise finalList"+finalList.size());
@@ -193,7 +195,6 @@ public class DBConnector {
 	}
 
 	private String filterMemories(List<JSONObject> memoriesList, String key, String userKey,String memoriesDate) throws ParseException {
-		// TODO Auto-generated method stub
 		List<JSONObject> memoriesTypeList=new ArrayList<JSONObject>();
 		List<JSONObject> finalList=new ArrayList<JSONObject>();
 		String	output="No Owner for particular date";
@@ -205,7 +206,7 @@ public class DBConnector {
 		int finalListSize=finalList.size();
 		if(finalList.size()>finalListSize) {
 			System.out.println("memories finalList"+finalList.size());
-		//finalList=memoriesFilterByDate(memoriesTypeList, memoriesDate);
+			finalList=memoriesFilterByDate(memoriesTypeList, memoriesDate);
 			output=service.generateMemoriesVideoFromFinalList(key,userKey,finalList);
 		}
 		}

@@ -81,7 +81,6 @@ public class VVishService {
 	}
 
 	public String generateMemoriesVideoFromFinalList(String key, String userKey, java.util.List<JSONObject> finalList) throws ParseException {
-		// TODO Auto-generated method stub
 		ArrayList<String> mediaList=new ArrayList<String>();
 
 		for(JSONObject capsules:finalList) {
