@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import java.util.Set;
 public class VVishService {
 
 	DBConnector dbConnector;
+	@Autowired
 	VideoStitchingService videoStichService;
 	final Logger log = LoggerFactory.getLogger(VVishService.class);
 	
