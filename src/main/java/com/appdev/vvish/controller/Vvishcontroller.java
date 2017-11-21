@@ -22,7 +22,7 @@ public class Vvishcontroller {
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
 	public  String[] getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody String[] mediaFiles) {
-		vVService.generateVideo(groupId, userId, mediaFiles);
+		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);
 		
 		return mediaFiles;	
 	}

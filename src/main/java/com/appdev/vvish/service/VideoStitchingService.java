@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -24,6 +25,71 @@ public class VideoStitchingService {
         this.imageCount = imageCount;
     }
 	
+	public void surpriseFlow(String imagesPath) throws IOException, InterruptedException {
+		FFmpeg ffmpeg = new FFmpeg("./lib/ffmpeg");
+		FFprobe ffprobe = new FFprobe("./lib/ffprobe");
+                FFmpegFormat ffformat = new FFmpegFormat();
+		ffformat.duration = 4;
+		FFmpegBuilder builder = new FFmpegBuilder();
+                FFmpegBuilder builder2 = new FFmpegBuilder();
+	
+		File imgDir = new File(imagesPath);
+		if(!imgDir.isDirectory()) {
+			return;
+		}
+		
+           
+            //video
+                 builder.setFormat("concat").setInput(imagesPath+"/videos_list.txt").addExtraArgs("-safe").addExtraArgs("0").addExtraArgs("-protocol_whitelist").addExtraArgs("\"file,http,https,tcp,tls\"").overrideOutputFiles(true).addOutput(imagesPath+"/outputVideo.mp4").setFormat("mp4").setVideoCodec("libx264").setDuration(2, TimeUnit.MINUTES).setVideoResolution(1024,720)
+        .setVideoFrameRate(24,1).done();
+					
+		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+		executor.createJob(builder).run();
+//		 String cmd[] = new String[]{
+//	                "./lib/ffmpeg","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
+//				"-i", "./surprise_media/videos_list.txt",
+//				"-c:v", "libx264", "-r","80",
+//	        "-pix_fmt", "yuv420p",
+//	"./surprise_media/img_video.mp4"};
+////	          
+	       // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
+	//   commandProcess(cmd);
+           
+            
+          /* double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
+                System.err.println("duration is "+duration);*/
+		
+		 createImageVideo(2);
+         // ffmpeg -stream_loop -1 -i input.mp4 -c copy -fflags +genpts output.mp4 
+         
+         //Final job- Overlay
+            String fnlcmd[] = new String[]{
+                "ffmpeg",
+			"-i", "./surprise_media/images_video.mp4",
+			"-i", "./surprise_media/outputVideo.mp4", "-filter_complex" ,
+        "[0:v][1:v]overlay","-pix_fmt", "yuv420p" ,"./surprise_media/final_video.mp4"};
+            
+            commandProcess(fnlcmd);          
+
+	}
+	
+    public void createImageVideo(double videoduration) throws IOException, InterruptedException {
+        FFprobe ffprobe = new FFprobe("./lib/ffprobe");
+        
+        //new code for image video    
+        
+        String cmd[] = new String[]{
+                "./lib/ffmpeg", "-r","1/2","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
+			"-i", "./surprise_media/images_list.txt",
+			"-c:v", "libx264", "-r","80",
+        "-pix_fmt", "yuv420p",
+"./surprise_media/images_video.mp4"};
+//          
+       // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
+   commandProcess(cmd);
+
+
+    }
 	public void stitchImagesToVideo(String imagesPath) throws IOException, InterruptedException {
 		FFmpeg ffmpeg = new FFmpeg("./lib/ffmpeg");
 		FFprobe ffprobe = new FFprobe("./lib/ffprobe");
@@ -87,47 +153,64 @@ public class VideoStitchingService {
             }
         }
         
-        int count = image_count;
-        int j=0;
-        FileWriter writer2;
-        for(int k=2;k<videoduration;k=k+2){
-            //               
-                try {
-                    
-                    writer2 = new FileWriter("./tmp/images_list.txt", true);
-                    writer2.write("file "+"'img"+j+".jpg'"+" duration "+2+" \n");
-                   j++;
-                   if(j==count-1){
-                       j=0;
-                   }
-                   if((k+2) >= videoduration){
-                       writer2.write("file "+"'img0.jpg'"+" duration "+(videoduration-k)+" \n");         
-                   }
-                   
-                    writer2.close();
-                } catch (IOException ex) {
-                    System.err.println("exception" + ex);
-                }
-        }
+//        int count = image_count;
+//        int j=0;
+//        FileWriter writer2;
+//        for(int k=2;k<videoduration;k=k+2){
+//            //               
+//                try {
+//                    
+//                    writer2 = new FileWriter("./tmp/images_list.txt", true);
+//                    writer2.write("file "+"'img"+j+".jpg'"+" duration "+2+" \n");
+//                   j++;
+//                   if(j==count-1){
+//                       j=0;
+//                   }
+//                   if((k+2) >= videoduration){
+//                       writer2.write("file "+"'img0.jpg'"+" duration "+(videoduration-k)+" \n");         
+//                   }
+//                   
+//                    writer2.close();
+//                } catch (IOException ex) {
+//                    System.err.println("exception" + ex);
+//                }
+//        }
         
         
         
         
-//     String cmd[] = new String[]{
-//                "ffmpeg", "-r","1/2",
-//			"-i", "./tmp/img%01d.jpg",
-//			"-c:v", "libx264", "-r","80" ,
-//        "-pix_fmt", "yuv420p",
-//"./tmp/img_video.mp4"};
-     
-        String cmd[] = new String[]{
-                "./lib/ffmpeg", "-r","1/2","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
-			"-i", "./tmp/images_list.txt",
+     String cmd3[] = new String[]{
+                "ffmpeg", "-r","1/2",
+			"-i", "./tmp/img%01d.jpg",
 			"-c:v", "libx264", "-r","80" ,
         "-pix_fmt", "yuv420p",
 "./tmp/img_video.mp4"};
+      
+       // ffmpeg -r 60 -f image2 -s 1920x1080 -i pic%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p test.mp4
+        String cmd2[] = new String[]{ 
+        "./lib/ffmpeg", "-r","1/5","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
+        "-i", "./tmp/images_list.txt",
+        "-vf","fps=25",
+        "-c:v", "libx264", 
+        "-maxrate","5M",
+        "-q:v", "2",		
+"./tmp/img_video.mp4"};
+        
+ 
+    
+         
+        
+     //   -filter_complex "[0]reverse[r];[0][r]concat,loop=2:80,setpts=N/13/TB" -vcodec libx264 -pix_fmt yuv420p -crf 17
+       // -f image2 -r 1/5
+        String cmd[] = new String[]{
+                "./lib/ffmpeg", "-r","1/2","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
+			"-i", "./tmp/images_list.txt",
+			"-c:v", "libx264", "-r","80",
+        "-pix_fmt", "yuv420p",
+"./tmp/img_video.mp4"};
 //          
-    commandProcess(cmd);
+       // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
+   commandProcess(cmd);
 
 
 //         double imageVideoDuration = ffprobe.probe("./tmp/img_video.mp4").getFormat().duration;
@@ -169,11 +252,11 @@ public class VideoStitchingService {
             StringBuilder strBuild = new StringBuilder();
 
             try (BufferedReader processOutputReader = new BufferedReader(new InputStreamReader(processDuration.getInputStream(), Charset.defaultCharset()));) {
-
+            	System.out.println("1");
                 String line;
 
                 while ((line = processOutputReader.readLine()) != null) {
-
+                	System.out.println("2");
                     strBuild.append(line + System.lineSeparator());
 
                 }
@@ -199,5 +282,57 @@ public class VideoStitchingService {
     	
     	
     }
+    
+    public void createVideoTextFile(ArrayList<String> videoFiles) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+
+        
+
+    	System.out.println("generating text file");
+
+    	    File file = new File("surprise_media/Videos_list.txt");
+
+    	    FileWriter fileWriter = new FileWriter(file, false); 
+
+    	    
+
+    	    for(String eachFile:videoFiles) {
+
+    	    fileWriter.write("file "+eachFile+System.getProperty( "line.separator" ));
+
+    	    //fileWriter.write("duration 2"+System.getProperty( "line.separator" ));
+
+    	    }
+
+    	    fileWriter.close();
+
+
+    	    }
+
+    	public void createImageTextFile(ArrayList<String> mediaFiles) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+
+    	    
+
+    	System.out.println("generating text file");
+
+    	    File file = new File("surprise_media/images_list.txt");
+
+    	    FileWriter fileWriter = new FileWriter(file, false); 
+
+    	    
+
+    	    for(String eachFile:mediaFiles) {
+
+    	    fileWriter.write("file "+eachFile+System.getProperty( "line.separator" ));
+
+    	    fileWriter.write("duration 2"+System.getProperty( "line.separator" ));
+
+    	    }
+
+    	    fileWriter.close();
+
+
+    	    }
+    
+
 
 }

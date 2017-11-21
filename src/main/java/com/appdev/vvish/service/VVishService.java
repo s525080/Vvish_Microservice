@@ -11,9 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 
@@ -25,16 +27,53 @@ public class VVishService {
 	VideoStitchingService videoStichService;
 	final Logger log = LoggerFactory.getLogger(VVishService.class);
 	
-	public String generateVideo(String groupId, String userId, String[] mediaFiles) {
+	public String generateSurpriseVideo(String groupId, String userId, String[] mediaFiles) {
 		
 		try {
-			videoStichService.createMediaTextFile(mediaFiles);
-			videoStichService.stitchImagesToVideo("./tmp/");
-			Storage storage = StorageOptions.newBuilder()
-	                .setCredentials(ServiceAccountCredentials.fromStream(new FileInputStream("/assets/serviceAccountKey.json")))
-	                .build()
-	                .getService();
+//			videoStichService.createMediaTextFile(mediaFiles);
+//			videoStichService.stitchImagesToVideo("./tmp/")String[] mediaFiles = {"https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2Fa.mp4?alt=media&token=b3abbc6f-701f-49fb-8785-5ca9b71ff282","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FOqwFJpBzckf9k07PguoCAfWr5c52%2F-Kyct6m4HkW1EBjjHQE2?alt=media&token=9a4ecef9-08e2-440a-8ebf-4582dd525085","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fwedding-pictures-26813-27529-hd-wallpapers.jpg?alt=media&token=8aa63d5c-0e5c-40bd-ba8f-39f469b175fb","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2FWendy_Erwin_WED_0578.jpg?alt=media&token=7723d1d4-cd64-441c-8ad4-61e544609937","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu?alt=media&token=18e99141-6f05-46f2-b87c-1c58ac62812d","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fbanner-home-02.jpg?alt=media&token=55763dd5-c646-4d10-8a8d-bad7ece8eaa7","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FLightStreaksDeepBlueHD.mp4?alt=media&token=bac58fc3-8bb7-4691-aa8c-e5cca946f0e6"};
+			Arrays.stream(new File("./surprise_media").listFiles()).forEach(File::delete);
+			ArrayList<String> videoFiles = new ArrayList<String>() ;
+			ArrayList<String> imageFiles= new ArrayList<String>() ;
+			int i = 0;
+			for(String media: mediaFiles){
+				System.out.println("inside");
+				String checkStr ="videos";
+				i++;
+				if(media.toLowerCase().contains(checkStr.toLowerCase())){
+					videoFiles.add(media);
+				}else{
+					imageFiles.add(media);
+				}
+			}
+
+			//
+			System.out.println(videoFiles.toString());
+			System.out.println(imageFiles.toString());
+			Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
+			videoStichService.createVideoTextFile(videoFiles);
+			videoStichService.createImageTextFile(imageFiles);
+			videoStichService.surpriseFlow("./surprise_media");
+			
+			
+		} catch (InterruptedException| IOException e) {
+			e.printStackTrace();
+		}
 		
+		return null;
+	}
+	
+	public String generateMemoriesVideo(String groupId, String userId, String[] mediaFiles) {
+		
+		try {
+		     Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
+
+			videoStichService.createMediaTextFile(mediaFiles);
+
+
+			videoStichService.createImageVideo(2);
+			
+			
 		} catch (InterruptedException| IOException e) {
 			e.printStackTrace();
 		}
@@ -57,7 +96,7 @@ public class VVishService {
 			}
 		}
 		String[] mediaFiles = mediaList.toArray(new String[0]);
-		String url=generateVideo(key, userKey, mediaFiles);
+		String url=generateSurpriseVideo(key, userKey, mediaFiles);
 		System.out.println("Generated video ");
 		System.out.println("Before PUT:" +key+"userKey :"+userKey+"URL :"+url);
 		String output = dbConnector.insertVideoUrl(key, userKey, url);
@@ -86,7 +125,7 @@ public class VVishService {
 			}
 		}
 		String[] mediaFiles = mediaList.toArray(new String[0]);
-		String url=generateVideo(key, userKey, mediaFiles);
+		String url=generateMemoriesVideo(key, userKey, mediaFiles);
 		System.out.println("Generated video ");
 		System.out.println("Before PUT:" +key+"userKey :"+userKey+"URL :"+url);
 		String output = dbConnector.insertVideoUrl(key, userKey, url);
