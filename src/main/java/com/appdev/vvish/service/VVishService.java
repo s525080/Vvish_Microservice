@@ -1,9 +1,6 @@
 package com.appdev.vvish.service;
 
 import com.appdev.vvish.dao.jersey.DBConnector;
-import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -12,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,8 +45,6 @@ public class VVishService {
 					imageFiles.add(media);
 				}
 			}
-
-			//
 			System.out.println(videoFiles.toString());
 			System.out.println(imageFiles.toString());
 			Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
