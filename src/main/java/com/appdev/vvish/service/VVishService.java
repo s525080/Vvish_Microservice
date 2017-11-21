@@ -25,10 +25,11 @@ public class VVishService {
 	DBConnector dbConnector;
 	@Autowired
 	VideoStitchingService videoStichService;
+	FirebaseStorage firebaseStorage;
 	final Logger log = LoggerFactory.getLogger(VVishService.class);
 	
 	public String generateSurpriseVideo(String groupId, String userId, String[] mediaFiles) {
-		
+		String finalUrl = null;
 		try {
 //			videoStichService.createMediaTextFile(mediaFiles);
 //			videoStichService.stitchImagesToVideo("./tmp/")String[] mediaFiles = {"https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2Fa.mp4?alt=media&token=b3abbc6f-701f-49fb-8785-5ca9b71ff282","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FOqwFJpBzckf9k07PguoCAfWr5c52%2F-Kyct6m4HkW1EBjjHQE2?alt=media&token=9a4ecef9-08e2-440a-8ebf-4582dd525085","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fwedding-pictures-26813-27529-hd-wallpapers.jpg?alt=media&token=8aa63d5c-0e5c-40bd-ba8f-39f469b175fb","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2FWendy_Erwin_WED_0578.jpg?alt=media&token=7723d1d4-cd64-441c-8ad4-61e544609937","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu?alt=media&token=18e99141-6f05-46f2-b87c-1c58ac62812d","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fbanner-home-02.jpg?alt=media&token=55763dd5-c646-4d10-8a8d-bad7ece8eaa7","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FLightStreaksDeepBlueHD.mp4?alt=media&token=bac58fc3-8bb7-4691-aa8c-e5cca946f0e6"};
@@ -37,11 +38,11 @@ public class VVishService {
 			Arrays.stream(new File("./surprise_media").listFiles()).forEach(File::delete);
 			ArrayList<String> videoFiles = new ArrayList<String>() ;
 			ArrayList<String> imageFiles= new ArrayList<String>() ;
-			int i = 0;
+			
 			for(String media: mediaFiles){
 				System.out.println("inside");
 				String checkStr ="videos";
-				i++;
+				
 				if(media.toLowerCase().contains(checkStr.toLowerCase())){
 					videoFiles.add(media);
 				}else{
@@ -56,17 +57,17 @@ public class VVishService {
 			videoStichService.createVideoTextFile(videoFiles);
 			videoStichService.createImageTextFile(imageFiles);
 			videoStichService.surpriseFlow("./surprise_media");
-			
+			finalUrl= firebaseStorage.uploadtoStorage("./surprise_media/final_video.mp4", groupId, userId);
 			
 		} catch (InterruptedException| IOException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return finalUrl;
 	}
 	
 	public String generateMemoriesVideo(String groupId, String userId, String[] mediaFiles) {
-		
+		String finalUrl = null;
 		try {
 	//		String[] mediaFiles = {"https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fwedding-pictures-26813-27529-hd-wallpapers.jpg?alt=media&token=8aa63d5c-0e5c-40bd-ba8f-39f469b175fb","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2FWendy_Erwin_WED_0578.jpg?alt=media&token=7723d1d4-cd64-441c-8ad4-61e544609937","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu?alt=media&token=18e99141-6f05-46f2-b87c-1c58ac62812d","https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/images%2Fj6besXtHhIgeBAY28tpAngbqMY63%2F-KxyKl0eh7iB14HILpdu%2Fbanner-home-02.jpg?alt=media&token=55763dd5-c646-4d10-8a8d-bad7ece8eaa7"};
 
@@ -74,15 +75,14 @@ public class VVishService {
 
 			videoStichService.createMediaTextFile(mediaFiles);
 
-
-			videoStichService.createImageVideo(2);
-			
+			videoStichService.memoriesFlow(2);
+			finalUrl= firebaseStorage.uploadtoStorage("./tmp/img_finalvideo.mp4", groupId, userId);
 			
 		} catch (InterruptedException| IOException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return finalUrl;
 	}
 	
 	public String generateSurpriseVideoFromFinalList(String key, String userKey, java.util.List<JSONObject> finalList) throws ParseException {

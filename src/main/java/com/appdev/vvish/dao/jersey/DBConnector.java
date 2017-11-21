@@ -171,6 +171,7 @@ public class DBConnector {
         if (surpriseTypeList.size() > surpriseTypeListSize) {
             finalList = getOwnerList(surpriseTypeList);
             output = service.generateSurpriseVideoFromFinalList(key, userKey, finalList);
+            
         }
 
         return output;

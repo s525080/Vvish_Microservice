@@ -119,7 +119,7 @@ public class VideoStitchingService {
           /* double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
                 System.err.println("duration is "+duration);*/
 		
-            convertImage(2);
+		memoriesFlow(2);
          // ffmpeg -stream_loop -1 -i input.mp4 -c copy -fflags +genpts output.mp4 
          
          //Final job- Overlay
@@ -135,66 +135,29 @@ public class VideoStitchingService {
         
         
 //ffmpeg -r 1/5 -i e%02d.png -c:v libx264 -r 30 -pix_fmt yuv420p EinsteinSlideShow.mp4
-    public void convertImage(double videoduration) throws IOException, InterruptedException {
+    public void memoriesFlow(double videoduration) throws IOException, InterruptedException {
         FFprobe ffprobe = new FFprobe("./lib/ffprobe");
         
-        //new code for image video
-         int image_count = 0;
-                
-        File directory = new File("./tmp");
-        //get all the files from a directory
-        File[] fList = directory.listFiles();
-        for (File file : fList){
+   
+
             
-            if (file.isFile()&& (file.getName().endsWith(".jpg") ||file.getName().endsWith(".png") ||file.getName().endsWith(".jpeg"))){
-                System.out.println(file.getName());
-                image_count++;
-           
-            }
-        }
-        
-//        int count = image_count;
-//        int j=0;
-//        FileWriter writer2;
-//        for(int k=2;k<videoduration;k=k+2){
-//            //               
-//                try {
-//                    
-//                    writer2 = new FileWriter("./tmp/images_list.txt", true);
-//                    writer2.write("file "+"'img"+j+".jpg'"+" duration "+2+" \n");
-//                   j++;
-//                   if(j==count-1){
-//                       j=0;
-//                   }
-//                   if((k+2) >= videoduration){
-//                       writer2.write("file "+"'img0.jpg'"+" duration "+(videoduration-k)+" \n");         
-//                   }
-//                   
-//                    writer2.close();
-//                } catch (IOException ex) {
-//                    System.err.println("exception" + ex);
-//                }
-//        }
-        
-        
-        
-        
-     String cmd3[] = new String[]{
-                "ffmpeg", "-r","1/2",
-			"-i", "./tmp/img%01d.jpg",
-			"-c:v", "libx264", "-r","80" ,
-        "-pix_fmt", "yuv420p",
-"./tmp/img_video.mp4"};
-      
-       // ffmpeg -r 60 -f image2 -s 1920x1080 -i pic%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p test.mp4
-        String cmd2[] = new String[]{ 
-        "./lib/ffmpeg", "-r","1/5","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
-        "-i", "./tmp/images_list.txt",
-        "-vf","fps=25",
-        "-c:v", "libx264", 
-        "-maxrate","5M",
-        "-q:v", "2",		
-"./tmp/img_video.mp4"};
+//        
+//     String cmd3[] = new String[]{
+//                "ffmpeg", "-r","1/2",
+//			"-i", "./tmp/img%01d.jpg",
+//			"-c:v", "libx264", "-r","80" ,
+//        "-pix_fmt", "yuv420p",
+//"./tmp/img_video.mp4"};
+//      
+//       // ffmpeg -r 60 -f image2 -s 1920x1080 -i pic%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p test.mp4
+//        String cmd2[] = new String[]{ 
+//        "./lib/ffmpeg", "-r","1/5","-f", "concat", "-safe","0","-protocol_whitelist", "\"file,http,https,tcp,tls\"",
+//        "-i", "./tmp/images_list.txt",
+//        "-vf","fps=25",
+//        "-c:v", "libx264", 
+//        "-maxrate","5M",
+//        "-q:v", "2",		
+//"./tmp/img_video.mp4"};
         
  
     
@@ -207,41 +170,13 @@ public class VideoStitchingService {
 			"-i", "./tmp/images_list.txt",
 			"-c:v", "libx264", "-r","80",
         "-pix_fmt", "yuv420p",
-"./tmp/img_video.mp4"};
+"./tmp/img_finalvideo.mp4"};
 //          
        // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
    commandProcess(cmd);
 
 
-//         double imageVideoDuration = ffprobe.probe("./tmp/img_video.mp4").getFormat().duration;
-//                System.err.println("duration is "+imageVideoDuration);
-//	double finaDuration = Math.round(videoduration/imageVideoDuration);
-//        System.out.println("final duration is"+Math.round(finaDuration));
-//        //ffmpeg -i input -filter_complex loop=3:75:25 output
-//        //clearing the content of video_list.txt
-//                    PrintWriter pwriter = new PrintWriter("./tmp/images_video_list.txt");
-//                    pwriter.print("");
-//                    pwriter.close();
-//        FileWriter writer;
-//                try {
-//                    
-//                    writer = new FileWriter("./tmp/images_video_list.txt", true);
-//                    for(int i=0;i<=finaDuration;i++){
-//                        writer.write("file img_video.mp4 \n");
-//                    }
-//                       
-//                    writer.close();
-//                } catch (IOException ex) {
-//                    System.err.println("exception" + ex);
-//                }
-//                //ffmpeg -f concat -i list.txt -c copy output.mp4
-//        String finalCmd[] = new String[]{
-//                "ffmpeg",
-//			"-f", "concat",
-//			"-i", "./tmp/images_video_list.txt",
-//                        "-c", "copy",
-//                        "./tmp/img_video2.mp4"};
-//        commandProcess(finalCmd);
+
     }
     
     public void commandProcess(String[] cmd) throws IOException, InterruptedException{
