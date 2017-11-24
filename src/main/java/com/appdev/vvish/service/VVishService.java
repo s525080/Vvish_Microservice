@@ -82,19 +82,22 @@ public class VVishService {
 	public String generateSurpriseVideoFromFinalList(String key, String userKey, java.util.List<JSONObject> finalList) throws ParseException {
 		// TODO Auto-generated method stub
 		ArrayList<String> mediaList=new ArrayList<String>();
-
+        String mlist = null;
+        String[] media = null;
 		for(JSONObject capsules:finalList) {
 			Set<String> groupKeys = capsules.keySet();
 			for(String groupKey:groupKeys) {
 				//log.info( "groupKey :"+groupKey);				
 				if (groupKey.equalsIgnoreCase("mediaFiles") ) {
 					log.info( "entered content:"+groupKey);
+					mlist = capsules.get(groupKey).toString();
+					media = mlist.substring(1, mlist.length()-1).split(",");
 					mediaList.add(capsules.get(groupKey).toString());
 				}
 			}
 		}
 		String[] mediaFiles = mediaList.toArray(new String[0]);
-		String url=generateSurpriseVideo(key, userKey, mediaFiles);
+		String url=generateSurpriseVideo(key, userKey, media);
 		System.out.println("Generated video ");
 		System.out.println("Before PUT:" +key+"userKey :"+userKey+"URL :"+url);
 		String output = dbConnector.insertVideoUrl(key, userKey, url);
