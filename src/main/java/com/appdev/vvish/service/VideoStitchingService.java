@@ -42,7 +42,7 @@ public class VideoStitchingService {
             //video
                  builder.setFormat("concat").setInput(imagesPath+"/videos_list.txt").addExtraArgs("-safe").addExtraArgs("0").addExtraArgs("-protocol_whitelist").addExtraArgs("\"file,http,https,tcp,tls\"").overrideOutputFiles(true).addOutput(imagesPath+"/outputVideo.mp4").setFormat("mp4").setVideoCodec("libx264").setDuration(2, TimeUnit.MINUTES).setVideoResolution(1024,720)
         .setVideoFrameRate(24,1).done();
-					
+		
 		FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
 		executor.createJob(builder).run();
 //		 String cmd[] = new String[]{
@@ -224,15 +224,16 @@ public class VideoStitchingService {
 
     	System.out.println("generating text file");
 
-    	    File file = new File("surprise_media/Videos_list.txt");
+    	    File file = new File("surprise_media/videos_list.txt");
 
     	    FileWriter fileWriter = new FileWriter(file, false); 
 
     	    
 
     	    for(String eachFile:videoFiles) {
-
-    	    fileWriter.write("file "+eachFile+System.getProperty( "line.separator" ));
+    	    	String result = eachFile.replace("\\", "");
+                String tmp = result.replace("\"", "\'");
+    	    fileWriter.write("file "+tmp+System.getProperty( "line.separator" ));
 
     	    //fileWriter.write("duration 2"+System.getProperty( "line.separator" ));
 
@@ -257,7 +258,9 @@ public class VideoStitchingService {
 
     	    for(String eachFile:mediaFiles) {
 
-    	    fileWriter.write("file "+eachFile+System.getProperty( "line.separator" ));
+    	    	String result = eachFile.replace("\\", "");
+                String tmp = result.replace("\"", "\'");
+    	    fileWriter.write("file "+tmp+System.getProperty( "line.separator" ));
 
     	    fileWriter.write("duration 2"+System.getProperty( "line.separator" ));
 
