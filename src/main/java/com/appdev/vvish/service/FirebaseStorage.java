@@ -58,7 +58,7 @@ public class FirebaseStorage {
 			String blobName = userId+groupId;
 			
 			
-			BlobId blobId = BlobId.of(bucket.getName(), blobName);
+			
 			
 			FileInputStream inputStream = new FileInputStream(new File(path));
 			BlobInfo blobInfo = BlobInfo.newBuilder(bucket.getName(), blobName)
@@ -66,7 +66,7 @@ public class FirebaseStorage {
 					.setAcl(new ArrayList<>(Arrays.asList(Acl.of(User.ofAllUsers(), Role.READER))))
 					.build();
 			log.info("bucket name is "+bucket.getName());
-			
+			BlobId blobId = BlobId.of(bucket.getName(), blobName);
 			try (WriteChannel writer = storage.writer(blobInfo)) {
 				byte[] buffer = new byte[1024];
 				int limit;
@@ -78,14 +78,13 @@ public class FirebaseStorage {
 				} catch (Exception ex) {
 					// handle exception
 				}finally {
-					
-					log.info("link is "+storage.get(blobId).getSelfLink());
-					log.info("link is "+storage.get(blobId).getMediaLink());
-					
-					finalurl = storage.get(blobId).getMediaLink();
 					writer.close();
 				}
 			}
+			log.info("link is "+storage.get(blobId).getSelfLink());
+			log.info("link is "+storage.get(blobId).getMediaLink());
+			
+			finalurl = storage.get(blobId).getMediaLink();
 		
 		return finalurl;
 	}
