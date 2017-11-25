@@ -18,7 +18,7 @@ public class ScheduledTasks {
     @Autowired
     DBConnector connector;
 
-    @Scheduled(fixedRate = 50000000)
+    @Scheduled(fixedRate = 90000)
     public void reportCurrentTime() throws IOException, ParseException {
         System.out.println("The time is now {}"+ dateFormat.format(new Date()));
         connector.fetchGroups();

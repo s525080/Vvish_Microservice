@@ -18,9 +18,11 @@ import java.util.Set;
 @Service
 public class VVishService {
 
+	@Autowired
 	DBConnector dbConnector;
 	@Autowired
 	VideoStitchingService videoStichService;
+	@Autowired
 	FirebaseStorage firebaseStorage;
 	final Logger log = LoggerFactory.getLogger(VVishService.class);
 	
@@ -51,6 +53,8 @@ public class VVishService {
 			videoStichService.createVideoTextFile(videoFiles);
 			videoStichService.createImageTextFile(imageFiles);
 			videoStichService.surpriseFlow("./surprise_media");
+			System.out.println("user id" +userId);
+			System.out.println("group id" +groupId);
 			finalUrl= firebaseStorage.uploadtoStorage("./surprise_media/final_video.mp4", groupId, userId);
 			
 		} catch (InterruptedException| IOException e) {
@@ -92,6 +96,7 @@ public class VVishService {
 					log.info( "entered content:"+groupKey);
 					mlist = capsules.get(groupKey).toString();
 					media = mlist.substring(1, mlist.length()-1).split(",");
+					
 					mediaList.add(capsules.get(groupKey).toString());
 				}
 			}

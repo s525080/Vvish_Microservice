@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.appdev.vvish.dao.FirebaseConnector;
 import com.google.auth.oauth2.ServiceAccountCredentials;
@@ -29,6 +30,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseCredentials;
 import com.google.firebase.cloud.StorageClient;
 
+@Component
 public class FirebaseStorage {
 	
 	public String uploadtoStorage(String path,String groupId, String userId) throws IOException {
@@ -79,6 +81,7 @@ public class FirebaseStorage {
 					
 					log.info("link is "+storage.get(blobId).getSelfLink());
 					log.info("link is "+storage.get(blobId).getMediaLink());
+					
 					finalurl = storage.get(blobId).getMediaLink();
 					writer.close();
 				}

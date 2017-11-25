@@ -50,10 +50,10 @@ public class VideoStitchingService {
 //				"-i", "./surprise_media/videos_list.txt",
 //				"-c:v", "libx264", "-r","80",
 //	        "-pix_fmt", "yuv420p",
-//	"./surprise_media/img_video.mp4"};
-////	          
-	       // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
-	//   commandProcess(cmd);
+//	"./surprise_media/outputVideo.mp4"};
+//////	          
+//	       // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
+//	   commandProcess(cmd);
            
             
           /* double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
