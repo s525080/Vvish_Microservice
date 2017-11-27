@@ -1,6 +1,8 @@
 package com.appdev.vvish.dao.jersey;
 
+import com.appdev.vvish.model.Group;
 import com.appdev.vvish.service.VVishService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -31,7 +33,7 @@ public class DBConnector {
     VVishService service;
     Logger log = LoggerFactory.getLogger(DBConnector.class);
 
-    public JSONObject fetchGroups() throws UniformInterfaceException, IOException, ParseException {
+    public JSONObject fetchGroups() throws Exception {
 
         ClientResponse response = getGetResponse();
         log.info("responseStatus :" + response.getStatus());
@@ -94,8 +96,12 @@ public class DBConnector {
         return response;
     }
 
-    public String sortbyType(JSONObject json, String memoriesDate, String surpriseDate) throws ParseException {
+    public String sortbyType(JSONObject json, String memoriesDate, String surpriseDate) throws Exception {
 
+    	ObjectMapper mapper = new ObjectMapper();
+
+        Group groupObj = null;
+        
         List<JSONObject> supriseList = new ArrayList<JSONObject>();
         List<JSONObject> memoriesList = new ArrayList<JSONObject>();
         List<JSONObject> capsuleList = new ArrayList<JSONObject>();
@@ -120,7 +126,13 @@ public class DBConnector {
                 //log.info( "userValue :"+userValue);
 
                 Set<String> groupKeys = userValue.keySet();
+                groupObj = mapper.readValue(userValue.toJSONString(), Group.class);
 
+                log.info("Group Object - "+ groupObj.toString());
+
+                log.info("isValidSurpriseGroup - "+ groupObj.isValidSurpriseGroup());
+
+                log.info("isValidMemoriesGroup - "+ groupObj.isValidMemoriesGroup());
 
                 for (String groupKey : groupKeys) {
                     //log.info( "groupKey :"+groupKey);

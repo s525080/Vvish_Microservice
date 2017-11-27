@@ -2,6 +2,7 @@ package com.appdev.vvish.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,23 +17,28 @@ public class Group {
 
 	private String role;
 	private String type;
-	private String toDate;
+	private String todate;
+	private String finalVideo;
 	private List<String> mediaFiles;
 	private List<Contacts> contacts;
 	private List<Contacts> target;
 	
 	public boolean isValidSurpriseGroup() throws ParseException {
-		return ((VVishConstants.SURPRISE_GROUP.equalsIgnoreCase(this.type)) &&
+		return ((VVishConstants.SURPRISE_GROUP.equalsIgnoreCase(this.type)) && isFinalVideoNotGenerated() &&
 				this.isOwner() && this.isTime(VVishConstants.SURPRISE_GROUP));
 	}
 	
 	public boolean isValidMemoriesGroup() throws ParseException {
-		return ((VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) && 
-				this.isTime(VVishConstants.MEMORIES_GROUP));
+		return ((VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) && isFinalVideoNotGenerated() &&
+				this.isOwner() && this.isTime(VVishConstants.MEMORIES_GROUP));
 	}
 	
 	public boolean isOwner() {
 		return VVishConstants.GROUP_OWNER.equalsIgnoreCase(this.role);
+	}
+	
+	public boolean isFinalVideoNotGenerated() {
+		return (this.finalVideo.isEmpty());
 	}
 	
 	public boolean isTime(String groupType) throws ParseException {
@@ -40,14 +46,24 @@ public class Group {
 		cal.setTime(new Date());
 		
 		if(VVishConstants.SURPRISE_GROUP.equalsIgnoreCase(this.type)) {
-			cal.add(Calendar.DAY_OF_MONTH, -1);
-		}
-		
-		if(VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) {
 			cal.add(Calendar.DAY_OF_MONTH, 1);
 		}
 		
-		return (sdf.format(cal.getTime()).equals(sdf.format(this.getToDate())));
+		if(VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) {
+			cal.add(Calendar.DAY_OF_MONTH, -1);
+		}
+		
+		return (sdf.format(cal.getTime()).equals(sdf.format(this.getTodate())));
+	}
+	
+	public List<String> memoryMedia() {
+		
+		List<String> mediaList = new ArrayList<>();
+		for(Contacts contact : this.contacts) {
+			mediaList.addAll(contact.getMediaFiles());
+		}
+		
+		return mediaList;
 	}
 	
 	public String getRole() {
@@ -64,13 +80,22 @@ public class Group {
 		this.type = type;
 	}
 
-	public Date getToDate() throws ParseException {
-		return this.sdf.parse(toDate);
-	}
-	public void setToDate(String toDate) {
-		this.toDate = toDate;
+	public Date getTodate() throws ParseException {
+		return this.sdf.parse(todate);
 	}
 	
+	public void setTodate(String todate) {
+		this.todate = todate;
+	}
+	
+	public String getFinalVideo() {
+		return finalVideo;
+	}
+
+	public void setFinalVideo(String finalVideo) {
+		this.finalVideo = finalVideo;
+	}
+
 	public List<String> getMediaFiles() {
 		return mediaFiles;
 	}
@@ -90,6 +115,12 @@ public class Group {
 	}
 	public void setTarget(List<Contacts> target) {
 		this.target = target;
+	}
+
+	@Override
+	public String toString() {
+		return "Group [Role=" + role + ", Type=" + type + ", ToDate=" + todate + ", finalVideo="
+				+ finalVideo + "]";
 	}
 	
 }
