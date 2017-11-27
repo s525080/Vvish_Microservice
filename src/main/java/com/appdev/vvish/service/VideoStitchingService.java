@@ -56,16 +56,17 @@ public class VideoStitchingService {
 //	   commandProcess(cmd);
            
             
-          /* double duration = ffprobe.probe("./tmp/output.mp4").getFormat().duration;
-                System.err.println("duration is "+duration);*/
+           double duration = ffprobe.probe(imagesPath+"/outputVideo.mp4").getFormat().duration;
+                System.out.println("duration is "+duration);
 		
-		 createImageVideo(2);
+		// createImageVideo(2);
+		 createImageVideo(duration);
          // ffmpeg -stream_loop -1 -i input.mp4 -c copy -fflags +genpts output.mp4 
          
          //Final job- Overlay
             String fnlcmd[] = new String[]{
                 "ffmpeg",
-			"-i", "./surprise_media/images_video.mp4",
+			"-i", "./surprise_media/img_video2.mp4",
 			"-i", "./surprise_media/outputVideo.mp4", "-filter_complex" ,
         "[0:v][1:v]overlay","-pix_fmt", "yuv420p" ,"./surprise_media/final_video.mp4"};
             
@@ -87,6 +88,36 @@ public class VideoStitchingService {
 //          
        // Process ffmpeg2 = Runtime.getRuntime().exec(cmd);
    commandProcess(cmd);
+   
+ double imageVideoDuration = ffprobe.probe("./surprise_media/images_video.mp4").getFormat().duration;
+ System.err.println("duration is "+imageVideoDuration);
+double finaDuration = Math.round(videoduration/imageVideoDuration);
+System.out.println("final duration is"+Math.round(finaDuration));
+////ffmpeg -i input -filter_complex loop=3:75:25 output
+////clearing the content of video_list.txt
+     PrintWriter pwriter = new PrintWriter("./surprise_media/images_video_list.txt");
+     pwriter.print("");
+     pwriter.close();
+FileWriter writer;
+ try {
+     
+     writer = new FileWriter("./surprise_media/images_video_list.txt", true);
+     for(int i=0;i<=finaDuration;i++){
+         writer.write("file images_video.mp4 \n");
+     }
+        
+     writer.close();
+ } catch (IOException ex) {
+     System.err.println("exception" + ex);
+ }
+// //ffmpeg -f concat -i list.txt -c copy output.mp4
+String finalCmd[] = new String[]{
+ "ffmpeg",
+"-f", "concat",
+"-i", "./surprise_media/images_video_list.txt",
+         "-c", "copy",
+         "./surprise_media/img_video2.mp4"};
+commandProcess(finalCmd);
 
 
     }
