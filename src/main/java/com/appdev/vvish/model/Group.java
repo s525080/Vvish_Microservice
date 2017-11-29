@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Group {
 	
-	private final SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 	private String role;
 	private String type;
@@ -52,7 +52,8 @@ public class Group {
 		if(VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) {
 			cal.add(Calendar.DAY_OF_MONTH, -1);
 		}
-		
+		String date = sdf.format(cal.getTime());
+		String date2 = sdf.format(this.getTodate());
 		return (sdf.format(cal.getTime()).equals(sdf.format(this.getTodate())));
 	}
 	
