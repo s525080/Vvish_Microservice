@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Configuration
 public class Vvishcontroller {
@@ -21,7 +23,7 @@ public class Vvishcontroller {
 	@PostMapping(value = "/generateVideo/{userId}/{groupId}", 
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
-	public  String[] getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody String[] mediaFiles) {
+	public  List<String> getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody List<String> mediaFiles) {
 		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);
 		
 		return mediaFiles;	

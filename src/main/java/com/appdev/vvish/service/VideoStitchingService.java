@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -235,7 +236,7 @@ commandProcess(finalCmd);
 
             System.out.println(outputJson);
     }
-    public void createMediaTextFile(String[] mediaFiles) throws UnsupportedEncodingException, FileNotFoundException, IOException{
+    public void createMediaTextFile(List<String> mediaFiles) throws UnsupportedEncodingException, FileNotFoundException, IOException{
     	
     	File file = new File("tmp/images_list.txt");
     	FileWriter fileWriter = new FileWriter(file, false); 

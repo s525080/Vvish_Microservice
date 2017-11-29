@@ -99,64 +99,42 @@ public class DBConnector {
     public String sortbyType(JSONObject json, String memoriesDate, String surpriseDate) throws Exception {
 
     	ObjectMapper mapper = new ObjectMapper();
-
         Group groupObj = null;
-        
-        List<JSONObject> supriseList = new ArrayList<JSONObject>();
-        List<JSONObject> memoriesList = new ArrayList<JSONObject>();
         List<JSONObject> capsuleList = new ArrayList<JSONObject>();
-        List<JSONObject> finalCapsuleList = new ArrayList<JSONObject>();
-        String memoriesresponse;
-        String surpriseresponse;
-        log.info("memoriesDate date  :" + memoriesDate);
-        log.info("surpriseDate date  :" + surpriseDate);
         JSONObject obj = new JSONObject(json);
         Set<String> set = obj.keySet();
-        //String key = null;
+
+        log.info("memoriesDate date  :" + memoriesDate);
+        log.info("surpriseDate date  :" + surpriseDate);
+
         for (String key : set) {
-            log.info("key :" + key);
             JSONObject value = (JSONObject) obj.get(key);
-            log.info("value :" + value);
             Set<String> userSet = value.keySet();
+
+            log.info("value :" + value);
+            log.info("key :" + key);
             log.info("userSet :" + userSet);
 
             for (String userKey : userSet) {
-                //log.info( "userKey :"+userKey);
                 JSONObject userValue = (JSONObject) value.get(userKey);
-                //log.info( "userValue :"+userValue);
 
-                Set<String> groupKeys = userValue.keySet();
                 groupObj = mapper.readValue(userValue.toJSONString(), Group.class);
 
                 log.info("Group Object - "+ groupObj.toString());
-
                 log.info("isValidSurpriseGroup - "+ groupObj.isValidSurpriseGroup());
-
                 log.info("isValidMemoriesGroup - "+ groupObj.isValidMemoriesGroup());
 
-                for (String groupKey : groupKeys) {
-                    //log.info( "groupKey :"+groupKey);
-
-                    if (groupKey.equalsIgnoreCase("type") && userValue.get(groupKey).toString().equalsIgnoreCase("Memories")) {
-                        log.info("entered content:" + groupKey);
-                        memoriesList.add(userValue);
-                        memoriesresponse = filterMemories(memoriesList, key, userKey, memoriesDate);
-
-                    } else if (groupKey.equalsIgnoreCase("type") && userValue.get(groupKey).toString().equalsIgnoreCase("Surprise")) {
-                        supriseList.add(userValue);
-                        surpriseresponse = fileterSuprises(supriseList, key, userKey, surpriseDate);
-
-                    } else if (groupKey.equalsIgnoreCase("type") && userValue.get(groupKey).toString().equalsIgnoreCase("Capsule")) {
+                    if (groupObj.isValidMemoriesGroup()) {
+                        service.generateMemoriesVideoFromFinalList(key,userKey,groupObj);
+                    } else if (groupObj.isValidSurpriseGroup()) {
+                        service.generateSurpriseVideoFromFinalList(key,userKey,groupObj);
+                    } else {
                         capsuleList.add(userValue);
-                        finalCapsuleList = getOwnerList(capsuleList);
+                        getOwnerList(capsuleList);
                     }
-                }
             }
 
         }
-        //	log.info("currentDate :"+sysdate);
-        log.info("memoriesList :" + memoriesList.size());
-        log.info("supriseList :" + supriseList.size());
         log.info("capsuleList :" + capsuleList.size());
 
         return "Final URL is obtained";
@@ -174,40 +152,6 @@ public class DBConnector {
         return response.getEntity(String.class);
     }
 
-    private String fileterSuprises(List<JSONObject> surpriseList, String key, String userKey, String surpriseDate) throws ParseException {
-        List<JSONObject> surpriseTypeList = new ArrayList<JSONObject>();
-        List<JSONObject> finalList = new ArrayList<JSONObject>();
-        String output = "No Owner for particular Date";
-        int surpriseTypeListSize = surpriseTypeList.size();
-        surpriseTypeList = surpriseFilterByDate(surpriseList, surpriseDate);
-        if (surpriseTypeList.size() > surpriseTypeListSize) {
-            finalList = getOwnerList(surpriseTypeList);
-            output = service.generateSurpriseVideoFromFinalList(key, userKey, finalList);
-            
-        }
-
-        return output;
-    }
-
-    private String filterMemories(List<JSONObject> memoriesList, String key, String userKey, String memoriesDate) throws ParseException {
-        List<JSONObject> memoriesTypeList = new ArrayList<JSONObject>();
-        List<JSONObject> finalList = new ArrayList<JSONObject>();
-        String output = "No Owner for particular date";
-        int memoriesTypeListSize = memoriesTypeList.size();
-        memoriesTypeList = memoriesFilterByDate(memoriesList, memoriesDate);
-        if (memoriesTypeList.size() > memoriesTypeListSize) {
-            System.out.println("memoriesTypeList.size()" + memoriesTypeList.size());
-            finalList = getOwnerList(memoriesTypeList);
-            int finalListSize = finalList.size();
-            if (finalList.size() > finalListSize) {
-                System.out.println("memories finalList" + finalList.size());
-                finalList = memoriesFilterByDate(memoriesTypeList, memoriesDate);
-                output = service.generateMemoriesVideoFromFinalList(key, userKey, finalList);
-            }
-        }
-        return output;
-
-    }
 
     public List<JSONObject> getOwnerList(List<JSONObject> inputlist) {
         List<JSONObject> ownerList = new ArrayList<JSONObject>();
@@ -226,35 +170,4 @@ public class DBConnector {
         return ownerList;
     }
 
-    private List<JSONObject> memoriesFilterByDate(List<JSONObject> list, String memoriesDate) {
-        List<JSONObject> typeList = new ArrayList<JSONObject>();
-
-        for (JSONObject capsules : list) {
-            Set<String> groupKeys = capsules.keySet();
-            for (String groupKey : groupKeys) {
-                //log.info( "groupKey :"+groupKey);
-                if (groupKey.equalsIgnoreCase("todate") && capsules.get(groupKey).toString().substring(0, 10).equalsIgnoreCase(memoriesDate)) {
-                    log.info("entered content:" + groupKey);
-                    typeList.add(capsules);
-                }
-            }
-        }
-        return typeList;
-    }
-
-    private List<JSONObject> surpriseFilterByDate(List<JSONObject> list, String surpriseDate) {
-        List<JSONObject> typeList = new ArrayList<JSONObject>();
-        for (JSONObject capsules : list) {
-            Set<String> groupKeys = capsules.keySet();
-            for (String groupKey : groupKeys) {
-                //log.info( "groupKey :"+groupKey);
-
-                if (groupKey.equalsIgnoreCase("todate") && capsules.get(groupKey).toString().substring(0, 10).equalsIgnoreCase(surpriseDate)) {
-                    log.info("entered content:" + groupKey + surpriseDate);
-                    typeList.add(capsules);
-                }
-            }
-        }
-        return typeList;
-    }
 }
