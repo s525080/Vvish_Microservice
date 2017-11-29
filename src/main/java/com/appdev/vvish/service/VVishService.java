@@ -2,7 +2,6 @@ package com.appdev.vvish.service;
 
 import com.appdev.vvish.dao.jersey.DBConnector;
 import com.appdev.vvish.model.Group;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 
 @Service
