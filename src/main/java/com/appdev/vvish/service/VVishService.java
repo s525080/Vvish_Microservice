@@ -80,15 +80,17 @@ public class VVishService {
 	public String generateSurpriseVideoFromFinalList(String key, String userKey, Group groupObj) throws ParseException {
 		log.info("Entered generateSurpriseVideoFromFinalList");
 		String url=generateSurpriseVideo(key, userKey, groupObj.getMediaFiles());
-		String output = dbConnector.insertVideoUrl(key, userKey, url);
-		return output;
+		return insertUrl(key, userKey, url);
+	}
+
+	private String insertUrl(String key, String userKey, String url) throws ParseException {
+		return dbConnector.insertVideoUrl(key, userKey, url);
 	}
 
 	public String generateMemoriesVideoFromFinalList(String key, String userKey, Group groupObj) throws ParseException {
 		log.info("Entered generateMemoriesVideoFromFinalList");
 		String url=generateMemoriesVideo(key, userKey, groupObj.getMediaFiles());
-		String output = dbConnector.insertVideoUrl(key, userKey, url);
-		return output;
+		return insertUrl(key, userKey, url);
 	}
 
 }
