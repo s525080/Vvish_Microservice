@@ -34,25 +34,11 @@ public class VVishService {
 			Arrays.stream(new File("./surprise_media").listFiles()).forEach(File::delete);
 			ArrayList<String> videoFiles = new ArrayList<String>() ;
 			ArrayList<String> imageFiles= new ArrayList<String>() ;
-			
-			for(String media: mediaFiles){
-				System.out.println("inside");
-				String checkStr ="videos";
-				
-				if(media.toLowerCase().contains(checkStr.toLowerCase())){
-					videoFiles.add(media);
-				}else{
-					imageFiles.add(media);
-				}
-			}
-			System.out.println(videoFiles.toString());
-			System.out.println(imageFiles.toString());
+			segregateVideosImages(mediaFiles, videoFiles, imageFiles);
 			Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
 			videoStichService.createVideoTextFile(videoFiles);
 			videoStichService.createImageTextFile(imageFiles);
 			videoStichService.surpriseFlow("./surprise_media");
-			System.out.println("user id" +userId);
-			System.out.println("group id" +groupId);
 			finalUrl= firebaseStorage.uploadtoStorage("./surprise_media/final_video.mp4", groupId, userId);
 			
 		} catch (InterruptedException| IOException e) {
@@ -61,7 +47,20 @@ public class VVishService {
 		
 		return finalUrl;
 	}
-	
+
+	private void segregateVideosImages(List<String> mediaFiles, ArrayList<String> videoFiles, ArrayList<String> imageFiles) {
+		log.info("Entered segregateVideosImages");
+
+		for(String media: mediaFiles){
+            String checkStr ="videos";
+            if(media.toLowerCase().contains(checkStr.toLowerCase())){
+                videoFiles.add(media);
+            }else{
+                imageFiles.add(media);
+            }
+        }
+	}
+
 	public String generateMemoriesVideo(String groupId, String userId, List<String> mediaFiles) {
 		String finalUrl = null;
 		try {
