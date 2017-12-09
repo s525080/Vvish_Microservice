@@ -1,0 +1,120 @@
+package com.appdev.vvish.service;
+
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.appdev.vvish.constants.VVishConstants;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.telesign.MessagingClient;
+import com.telesign.RestClient;
+
+@Service
+public class SMSService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(SMSService.class);
+	
+	@Value("#{'${vvish.url}'}")
+	private String vURL;
+	
+	@Value("#{'${sms.customer_id}'}")
+	private String smsCustId;
+	
+	@Value("#{'${sms.api_key}'}")
+	private String smsApiKey;
+	
+	@Value("#{'${sms.toName.vish}'}")
+	private String toNameVish;
+	
+	@Value("#{'${sms.invite_msg}'}")
+	private String inviteMsg;
+	
+	@Value("#{'${sms.final_video_msg}'}")
+	private String finalVidMsg;
+
+	@SuppressWarnings("unchecked")
+	public ResponseEntity<String> sendMessage(String msgDetails) {
+		
+		LOG.info("SendMessage - Details Received :: " + msgDetails);
+		String response = null;
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			Map<String, String> msgMap = mapper.readValue(msgDetails.toString(), Map.class);
+			
+			String toPhNo = msgMap.get("toPhNo");
+			String toName = msgMap.get("toName");
+			String fromPhNo = msgMap.get("fromPhNo");
+			String fromName = msgMap.get("fromName");
+			String occassion = msgMap.get("occassion");
+			String finalVid = msgMap.get("finalVid");
+			String msgType = msgMap.get("msgType");
+		
+			String msg = null;
+			if(msgType.equalsIgnoreCase(VVishConstants.INVITE)) {
+				msg = replaceNamesAndURL(toName, fromPhNo, fromName, inviteMsg);
+			} else if (msgType.equalsIgnoreCase(VVishConstants.VISH)) {
+				msg = replaceNamesAndURL(toName, fromPhNo, fromName, finalVidMsg).replace("$occassion", occassion).replace("$vVid", finalVid);
+			}
+			
+			response = this.sendSMS(toPhNo, msg);
+
+		} catch (Exception e) {
+			LOG.error("Error while sending SMS..", e);
+			response = "Message could not be delivered";
+		}
+		
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	private String replaceNamesAndURL(String toName, String fromPhNo, String fromName, String msg) {
+		
+		LOG.info("From : " + fromPhNo +" - "+ fromName + " :: To : "+ toName + " :: Message : "+ msg);
+		
+		String pMsg = msg.replace("$URL", vURL);
+		
+		//Add Name of the receiver if toName is not NULL
+		if(toName != null) {
+			String tVish = toNameVish.replace("$toName", toName);
+			LOG.info("To Salutation :: "+ tVish);
+			pMsg = tVish.concat(pMsg);
+			LOG.info("Message - "+ pMsg);
+		}
+		
+		//Replace Sender with Name if available or Phone Number
+		if(fromName != null) {
+			pMsg = pMsg.replace("$fromName", fromName);
+			LOG.info("From Name is not NULL - "+ pMsg);
+		} else if(fromPhNo != null) {
+			pMsg.replaceAll("$fromName", fromPhNo);
+			LOG.info("From Ph No is not NULL - "+ pMsg);
+		}
+		
+		LOG.info("Final Message :: "+ pMsg);
+		return pMsg;
+	}
+	
+	public String sendSMS(String phoneNumber, String message) throws Exception {
+		
+		LOG.info("Sending "+ message + " to "+ phoneNumber +" through SMS..");
+		
+		MessagingClient messagingClient = new MessagingClient(smsCustId, smsApiKey);
+        RestClient.TelesignResponse msgResp = messagingClient.message(phoneNumber, message, "ARN", null);
+        
+        LOG.info("Returned Status Code :: "+ msgResp.statusCode);
+        LOG.info("Body :: "+ msgResp.body);
+        
+        String response;
+        if(msgResp.statusCode == 200) {
+			response = "Message Delivered";
+		} else {
+			response = "Message Could not be delivered.";
+		}
+        
+        return response;
+	}
+}
