@@ -44,7 +44,11 @@ public class SMSService {
 			ObjectMapper mapper = new ObjectMapper();
 			MessageRequest msgReq = mapper.readValue(msgDetails.toString(), MessageRequest.class);
 			
-			response = this.prepareAndSendMessage(msgReq);
+			if(VVishConstants.VISH.equalsIgnoreCase(msgReq.getMsgType())) {
+				response = "Invalid Message Request.";
+			} else {
+				response = this.prepareAndSendMessage(msgReq);
+			}
 
 		} catch (Exception e) {
 			LOG.error("Error while sending SMS..", e);
@@ -90,13 +94,13 @@ public class SMSService {
 			LOG.info("From Ph No is not NULL - "+ pMsg);
 		}
 		
-		LOG.info("Final Message :: "+ pMsg);
+		LOG.info("Final Message before Value replacement :: "+ pMsg);
 		return pMsg;
 	}
 	
 	public String sendSMS(String phoneNumber, String message) throws Exception {
 		
-		LOG.info("Sending "+ message + " to "+ phoneNumber +" through SMS..");
+		LOG.info("Sending \""+ message + "\" to "+ phoneNumber +" through SMS..");
 		
 		MessagingClient messagingClient = new MessagingClient(smsCustId, smsApiKey);
         RestClient.TelesignResponse msgResp = messagingClient.message(phoneNumber, message, "ARN", null);
