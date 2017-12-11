@@ -52,8 +52,7 @@ public class Group {
 		if(VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) {
 			cal.add(Calendar.DAY_OF_MONTH, -1);
 		}
-		String date = sdf.format(cal.getTime());
-		String date2 = sdf.format(this.getTodate());
+		
 		return (sdf.format(cal.getTime()).equals(sdf.format(this.getTodate())));
 	}
 	

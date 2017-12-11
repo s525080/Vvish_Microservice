@@ -1,7 +1,5 @@
 package com.appdev.vvish.service;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.appdev.vvish.constants.VVishConstants;
+import com.appdev.vvish.model.MessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.telesign.MessagingClient;
 import com.telesign.RestClient;
@@ -37,31 +36,15 @@ public class SMSService {
 	@Value("#{'${sms.final_video_msg}'}")
 	private String finalVidMsg;
 
-	@SuppressWarnings("unchecked")
 	public ResponseEntity<String> sendMessage(String msgDetails) {
 		
 		LOG.info("SendMessage - Details Received :: " + msgDetails);
 		String response = null;
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			Map<String, String> msgMap = mapper.readValue(msgDetails.toString(), Map.class);
+			MessageRequest msgReq = mapper.readValue(msgDetails.toString(), MessageRequest.class);
 			
-			String toPhNo = msgMap.get("toPhNo");
-			String toName = msgMap.get("toName");
-			String fromPhNo = msgMap.get("fromPhNo");
-			String fromName = msgMap.get("fromName");
-			String occassion = msgMap.get("occassion");
-			String finalVid = msgMap.get("finalVid");
-			String msgType = msgMap.get("msgType");
-		
-			String msg = null;
-			if(msgType.equalsIgnoreCase(VVishConstants.INVITE)) {
-				msg = replaceNamesAndURL(toName, fromPhNo, fromName, inviteMsg);
-			} else if (msgType.equalsIgnoreCase(VVishConstants.VISH)) {
-				msg = replaceNamesAndURL(toName, fromPhNo, fromName, finalVidMsg).replace("$occassion", occassion).replace("$vVid", finalVid);
-			}
-			
-			response = this.sendSMS(toPhNo, msg);
+			response = this.prepareAndSendMessage(msgReq);
 
 		} catch (Exception e) {
 			LOG.error("Error while sending SMS..", e);
@@ -69,6 +52,19 @@ public class SMSService {
 		}
 		
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	public String prepareAndSendMessage(MessageRequest msgReq) throws Exception {
+		
+		String msg = null;
+		if(VVishConstants.INVITE.equalsIgnoreCase(msgReq.getMsgType())) {
+			msg = replaceNamesAndURL(msgReq.getToName(), msgReq.getFromPhNo(), msgReq.getFromName(), inviteMsg);
+		} else if (VVishConstants.VISH.equalsIgnoreCase(msgReq.getMsgType())) {
+			msg = replaceNamesAndURL(msgReq.getToName(), msgReq.getFromPhNo(), msgReq.getFromName(), finalVidMsg)
+					.replace("$occassion", msgReq.getOccassion()).replace("$vVid", msgReq.getFinalVid());
+		}
+		
+		return this.sendSMS(msgReq.getToPhNo(), msg);
 	}
 	
 	private String replaceNamesAndURL(String toName, String fromPhNo, String fromName, String msg) {
