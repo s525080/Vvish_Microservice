@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- For Async logging, set system property
+-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector
+     to make all loggers asynchronous. -->
+<Configuration status="WARN" packages="com.g6.fs.core.custom.logging">
+    <!-- TODO: Refactor properties to read from a common (app info?) properties file -->
+    <Properties>
+        <Property name="app.name">vvish</Property>
+        <Property name="log.file.loc">/app/vvish/logs</Property>
+        <Property name="archive.file.loc">/app/vvish/logs/archive</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console-Appender" target="SYSTEM_OUT">
+            <PatternLayout>
+                <pattern>
+                    [%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n
+                </pattern>>
+            </PatternLayout>
+        </Console>
+        <!-- Async loggers will auto-flush in batches. except error log, let's switch off immediate flush -->
+        <!-- if append is true, log file keeps growing. For info, debug and trace, we don't need to append -->
+        <RollingRandomAccessFile name="fs-error-appender"
+                                 fileName="${log.file.loc}/error.${app.name}.log"
+                                 filePattern="${archive.file.loc}/error.${app.name}.log.%d{yyyy-MM-dd-hh-mm}.gz">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n"/>
+            <ThresholdFilter level="WARN" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingRandomAccessFile>
+
+
+        <RollingRandomAccessFile name="fs-info-appender"
+                                 fileName="${log.file.loc}/info.${app.name}.log"
+                                 filePattern="${archive.file.loc}/info.${app.name}.log.%d{yyyy-MM-dd-hh-mm}.gz"
+                                 immediateFlush="false"
+                                 append="false">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n"/>
+            <ThresholdFilter level="INFO" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="fs-debug-appender"
+                                 fileName="${log.file.loc}/debug.${app.name}.log"
+                                 filePattern="${archive.file.loc}/debug.${app.name}.log.%d{yyyy-MM-dd-hh-mm}.gz"
+                                 immediateFlush="false"
+                                 append="false">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n"/>
+            <ThresholdFilter level="DEBUG" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="fs-trace-appender"
+                                 fileName="${log.file.loc}/trace.${app.name}.log"
+                                 filePattern="${archive.file.loc}/trace.${app.name}.log.%d{yyyy-MM-dd-hh-mm}.gz"
+                                 immediateFlush="false"
+                                 append="false">
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n"/>
+            <ThresholdFilter level="TRACE" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+    <Loggers>
+
+        <!-- Location provides the ability to scan stack trace to include location info.
+        By default, location is false. if true, the operation is significantly expensive.
+        It is therefore better to turn on only for console -->
+        <Root level="info" includeLocation="true" additivity="false">
+            <!-- <Root level="info"> -->
+            <AppenderRef ref="Console-Appender"/>
+            <!-- uncomment at your own risk -->
+            <!-- <AppenderRef ref="fs-trace-appender"/>
+            <AppenderRef ref="fs-debug-appender"/> -->
+            <AppenderRef ref="fs-info-appender"/>
+        </Root>
+
+        <AsyncLogger name="com.gf.fs.info.appender" level="info" additivity="false">
+            <AppenderRef ref="fs-info-appender"/>
+            <AppenderRef ref="fs-error-appender" />
+        </AsyncLogger>
+
+        <!-- it is wise to keep error logger in sync -->
+        <!-- no need for additivity flag as error has only one appender.
+        Should be true if multiple appenders are present to avoid confusion -->
+        <Logger name="com.gf.fs.error.appender" level="error">
+            <AppenderRef ref="fs-error-appender"/>
+        </Logger>
+
+        <!-- <AsyncLogger name="com.gf.fs.error.appender" level="error">
+            <AppenderRef ref="fs-error-appender"/>
+        </AsyncLogger> -->
+
+        <!-- uncomment when you need debug logging -->
+        <!-- <AsyncLogger name="com.gf.fs.debug.appender" level="debug" additivity="false">
+            <AppenderRef ref="fs-debug-appender"/>
+            <AppenderRef ref="fs-info-appender"/>
+            <AppenderRef ref="fs-error-appender" />
+        </AsyncLogger> -->
+
+        <!-- uncomment when you need trace logging -->
+        <!-- <AsyncLogger name="com.gf.fs.trace.appender" level="trace" additivity="false">
+            <AppenderRef ref="fs-trace-appender"/>
+            <AppenderRef ref="fs-debug-appender"/>
+            <AppenderRef ref="fs-info-appender"/>
+            <AppenderRef ref="fs-error-appender" />
+        </AsyncLogger> -->
+
+    </Loggers>
+</Configuration>
