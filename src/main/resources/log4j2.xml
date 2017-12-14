@@ -56,64 +56,13 @@
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingRandomAccessFile>
-        <RollingRandomAccessFile name="fs-trace-appender"
-                                 fileName="${log.file.loc}/trace.${app.name}.log"
-                                 filePattern="${archive.file.loc}/trace.${app.name}.log.%d{yyyy-MM-dd-hh-mm}.gz"
-                                 immediateFlush="false"
-                                 append="false">
-            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - {%msg}%n"/>
-            <ThresholdFilter level="TRACE" />
-            <Policies>
-                <SizeBasedTriggeringPolicy size="1 MB"/>
-            </Policies>
-            <DefaultRolloverStrategy max="10"/>
-        </RollingRandomAccessFile>
 
     </Appenders>
     <Loggers>
 
-        <!-- Location provides the ability to scan stack trace to include location info.
-        By default, location is false. if true, the operation is significantly expensive.
-        It is therefore better to turn on only for console -->
         <Root level="info" includeLocation="true" additivity="false">
-            <!-- <Root level="info"> -->
             <AppenderRef ref="Console-Appender"/>
-            <!-- uncomment at your own risk -->
-            <!-- <AppenderRef ref="fs-trace-appender"/>
-            <AppenderRef ref="fs-debug-appender"/> -->
             <AppenderRef ref="fs-info-appender"/>
         </Root>
-
-        <AsyncLogger name="com.gf.fs.info.appender" level="info" additivity="false">
-            <AppenderRef ref="fs-info-appender"/>
-            <AppenderRef ref="fs-error-appender" />
-        </AsyncLogger>
-
-        <!-- it is wise to keep error logger in sync -->
-        <!-- no need for additivity flag as error has only one appender.
-        Should be true if multiple appenders are present to avoid confusion -->
-        <Logger name="com.gf.fs.error.appender" level="error">
-            <AppenderRef ref="fs-error-appender"/>
-        </Logger>
-
-        <!-- <AsyncLogger name="com.gf.fs.error.appender" level="error">
-            <AppenderRef ref="fs-error-appender"/>
-        </AsyncLogger> -->
-
-        <!-- uncomment when you need debug logging -->
-        <!-- <AsyncLogger name="com.gf.fs.debug.appender" level="debug" additivity="false">
-            <AppenderRef ref="fs-debug-appender"/>
-            <AppenderRef ref="fs-info-appender"/>
-            <AppenderRef ref="fs-error-appender" />
-        </AsyncLogger> -->
-
-        <!-- uncomment when you need trace logging -->
-        <!-- <AsyncLogger name="com.gf.fs.trace.appender" level="trace" additivity="false">
-            <AppenderRef ref="fs-trace-appender"/>
-            <AppenderRef ref="fs-debug-appender"/>
-            <AppenderRef ref="fs-info-appender"/>
-            <AppenderRef ref="fs-error-appender" />
-        </AsyncLogger> -->
-
     </Loggers>
 </Configuration>
