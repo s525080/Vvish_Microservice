@@ -60,7 +60,7 @@
     </Appenders>
     <Loggers>
 
-        <Root level="info" includeLocation="true" additivity="false">
+        <Root level="warn" includeLocation="true" additivity="false">
             <AppenderRef ref="Console-Appender"/>
             <AppenderRef ref="fs-info-appender"/>
         </Root>
