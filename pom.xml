@@ -102,16 +102,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.appdev.vvish.VvishApplication</mainClass>
+				</configuration>
 				<executions>
 					<execution>
-						<id>boot</id>
-						<phase>package</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>repackage</goal>
 						</goals>
-						<configuration>
-							<skip>false</skip>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
