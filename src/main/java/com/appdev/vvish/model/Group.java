@@ -81,6 +81,7 @@ public class Group {
 	}
 
 	public Date getTodate() throws ParseException {
+		System.out.println("date is"+this.sdf.parse(todate));
 		return this.sdf.parse(todate);
 	}
 	

@@ -37,7 +37,7 @@ public class Vvishcontroller {
 	@PostMapping(value = "/generateVideo/{userId}/{groupId}", 
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
-	public  List<String> getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody List<String> mediaFiles) {
+	public  List<String> getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody List<String> mediaFiles) throws Exception {
 		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);
 		
 		return mediaFiles;	

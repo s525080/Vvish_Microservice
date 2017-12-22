@@ -44,6 +44,8 @@ public class DBConnector {
         final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String surpriseDate = getSurpriseDate(cal, dateFormat);
         String memoriesDate = getMemoriesDate(cal, dateFormat);
+        log.info("json is"+json.toString());
+        System.out.println("json is"+json.toString());
         sortbyType(json, memoriesDate, surpriseDate);
         return json;
     }
@@ -124,10 +126,13 @@ public class DBConnector {
                 log.info("isValidMemoriesGroup - "+ groupObj.isValidMemoriesGroup());
 
                     if (groupObj.isValidMemoriesGroup()) {
+                    	System.out.println("in generate memories");
                         service.generateMemoriesVideoFromFinalList(key,userKey,groupObj);
                     } else if (groupObj.isValidSurpriseGroup()) {
+                    	System.out.println("in generate surprise");
                         service.generateSurpriseVideoFromFinalList(key,userKey,groupObj);
                     } else {
+                    	System.out.println("in generate capsule");
                         capsuleList.add(userValue);
                         getOwnerList(capsuleList);
                     }
