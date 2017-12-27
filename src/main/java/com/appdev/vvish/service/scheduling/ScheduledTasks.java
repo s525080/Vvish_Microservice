@@ -18,7 +18,7 @@ public class ScheduledTasks {
     DBConnector connector;
 
     //@Scheduled(fixedRate = 90000)
-    @Scheduled(cron = "0 */6 * * * *")
+    @Scheduled(cron = "* 0/6 * * *")
     public void reportCurrentTime() throws Exception {
         System.out.println("The time is now {}"+ dateFormat.format(new Date()));
         connector.fetchGroups();
