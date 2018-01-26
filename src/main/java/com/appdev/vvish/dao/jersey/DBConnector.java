@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import com.appdev.vvish.model.Group;
+import com.appdev.vvish.model.Metamember;
 import com.appdev.vvish.service.VVishService;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -50,7 +52,8 @@ public class DBConnector {
         return json;
     }
 
-    public String insertVideoUrl(String userId, String groupId, String finalVideo) throws ParseException {
+    public String insertVideoUrl(String userId, String groupId, String finalVideo,Group groupObj) throws ParseException {
+
         Client client = null;
         ClientResponse response = null;
         WebResource webResource = null;
@@ -118,7 +121,7 @@ public class DBConnector {
 
             for (String userKey : userSet) {
                 JSONObject userValue = (JSONObject) value.get(userKey);
-
+                mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
                 groupObj = mapper.readValue(userValue.toJSONString(), Group.class);
 
                 log.info("Group Object - "+ groupObj.toString());

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.appdev.vvish.model.Group;
 import com.appdev.vvish.service.SMSService;
 import com.appdev.vvish.service.VVishService;
 
@@ -38,17 +39,19 @@ public class Vvishcontroller {
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
 	public  List<String> getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody List<String> mediaFiles) throws Exception {
-		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);
-		
+		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);	
 		return mediaFiles;	
 	}
 	
-	//trial
-	@GetMapping(value = "/generate", 
-			produces =  MediaType.TEXT_PLAIN_VALUE)
-	public  String getUser2() {
-		return "RETURN";	
+	@PostMapping(value = "/generateSurpriseVideo/{userId}/{groupId}", 
+			produces = { MediaType.APPLICATION_JSON_VALUE },
+			consumes = {MediaType.APPLICATION_JSON_VALUE} )
+	public  String getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody Group groupObj) throws Exception {
+		vVService.generateSurpriseVideoFromFinalList(groupId,userId,groupObj);
+		return "Success";	
 	}
+	
+	
 	
 	@PostMapping(value = "/invite",
 			consumes = { MediaType.APPLICATION_JSON_VALUE },

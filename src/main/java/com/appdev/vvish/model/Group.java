@@ -22,6 +22,7 @@ public class Group {
 	private List<String> mediaFiles;
 	private List<Contacts> contacts;
 	private List<Contacts> target;
+	private List<Metamember> membersGroupId;
 	
 	public boolean isValidSurpriseGroup() throws ParseException {
 		return ((VVishConstants.SURPRISE_GROUP.equalsIgnoreCase(this.type)) && isFinalVideoNotGenerated() &&
@@ -52,6 +53,7 @@ public class Group {
 		if(VVishConstants.MEMORIES_GROUP.equalsIgnoreCase(this.type)) {
 			cal.add(Calendar.DAY_OF_MONTH, -1);
 		}
+		
 		
 		return (sdf.format(cal.getTime()).equals(sdf.format(this.getTodate())));
 	}
@@ -117,11 +119,21 @@ public class Group {
 	public void setTarget(List<Contacts> target) {
 		this.target = target;
 	}
+	
+	
+
+	public List<Metamember> getMembersGroupId() {
+		return membersGroupId;
+	}
+
+	public void setMembersGroupId(List<Metamember> membersGroupId) {
+		this.membersGroupId = membersGroupId;
+	}
 
 	@Override
 	public String toString() {
 		return "Group [Role=" + role + ", Type=" + type + ", ToDate=" + todate + ", finalVideo="
-				+ finalVideo + "]";
+				+ finalVideo +" membersGroupId"+membersGroupId.toString()+ "]";
 	}
 	
 }

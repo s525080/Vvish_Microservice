@@ -38,7 +38,7 @@ public class ImageStitchingService {
 		List<String> mp4Videos = new ArrayList<>();
 		for (Iterator iterator = mediaFiles.iterator(); iterator.hasNext();) {
 			String url = (String) iterator.next();
-
+           if(url != ""){
 			UUID randomName = new UUID(64, 64);
 			randomName = randomName.randomUUID();
 			String crd = "./tmp/";
@@ -61,6 +61,7 @@ String fileTotal=			Utils.ImageToMp4(new File(completFilePath).getParent() + "\\
 			
 			
 			mp4Videos.add(fileTotal);
+		}
 		}
 //		System.out.println("You can find the output file here"+Utils.Finalize(Utils.concatenateM(mp4Videos )));;
 		

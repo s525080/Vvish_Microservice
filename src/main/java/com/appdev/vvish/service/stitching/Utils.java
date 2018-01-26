@@ -194,8 +194,10 @@ System.out.println("input"+inputFile);
 	public static int FADEFRAMES=30;
 	
 	//both should must be evens
-	public static int IMAGEWIDTH=1280;
-	public static int IMAGEHEIGHT=720;
+//	public static int IMAGEWIDTH=1280;
+//	public static int IMAGEHEIGHT=720;
+	public static int IMAGEWIDTH=640;
+	public static int IMAGEHEIGHT=640;
 	
 	public static String ImageToMp4(String inputFile,String outPutMp4) throws Exception {
 

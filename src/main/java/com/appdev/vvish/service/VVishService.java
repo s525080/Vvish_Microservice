@@ -1,12 +1,16 @@
 package com.appdev.vvish.service;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +19,10 @@ import org.springframework.stereotype.Service;
 
 import com.appdev.vvish.dao.jersey.DBConnector;
 import com.appdev.vvish.model.Group;
+import com.appdev.vvish.model.Metamember;
 import com.appdev.vvish.service.stitching.Main;
 import com.appdev.vvish.service.stitching.SettingsPath;
+import com.google.api.client.json.Json;
 
 
 @Service
@@ -107,17 +113,33 @@ public class VVishService {
 		log.info("Entered generateSurpriseVideoFromFinalList");
 		System.out.println("Entered generateSurpriseVideoFromFinalList");
 		String url=generateSurpriseVideo(key, userKey, groupObj.getMediaFiles());
-		return insertUrl(key, userKey, url);
+		return insertUrl(key, userKey, url,groupObj);
 	}
 
-	private String insertUrl(String key, String userKey, String url) throws ParseException {
-		return dbConnector.insertVideoUrl(key, userKey, url);
+	private String insertUrl(String key, String userKey, String url,Group groupObj) throws ParseException {
+		 JSONParser parser = new JSONParser();
+			
+        
+		//System.out.println("members in group"+groupObj.getMembersGroupId().size());
+		 dbConnector.insertVideoUrl(key, userKey, url, groupObj);
+		for(Metamember member:groupObj.getMembersGroupId()) {
+			
+    		
+	    System.out.println("hey"+member.getUid()+ " and "+ member.getGroupid());
+	    	  if(member.getGroupid() != "" && member.getUid() != "") {
+	    		  System.out.println("inside"+member.getUid()+ " and "+ member.getGroupid() );
+	    		  dbConnector.insertVideoUrl(member.getUid(), member.getGroupid(), url, groupObj);
+	    	  }
+	    	  
+		}
+		return "success";
 	}
 
 	public String generateMemoriesVideoFromFinalList(String key, String userKey, Group groupObj) throws Exception {
 		log.info("Entered generateMemoriesVideoFromFinalList");
-		String url=generateMemoriesVideo(key, userKey, groupObj.getMediaFiles());
-		return insertUrl(key, userKey, url);
+		String url=generateMemoriesVideo(key, userKey, groupObj.memoryMedia());
+	
+		return insertUrl(key, userKey, url, groupObj);
 	}
 
 }
