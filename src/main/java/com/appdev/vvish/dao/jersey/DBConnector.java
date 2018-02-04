@@ -115,7 +115,7 @@ public class DBConnector {
             JSONObject value = (JSONObject) obj.get(key);
             Set<String> userSet = value.keySet();
 
-            log.info("value :" + value);
+            //log.info("value :" + value);
             log.info("key :" + key);
             log.info("userSet :" + userSet);
 
