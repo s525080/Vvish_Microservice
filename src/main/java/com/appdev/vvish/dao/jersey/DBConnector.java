@@ -46,8 +46,7 @@ public class DBConnector {
         final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String surpriseDate = getSurpriseDate(cal, dateFormat);
         String memoriesDate = getMemoriesDate(cal, dateFormat);
-        log.info("json is"+json.toString());
-        System.out.println("json is"+json.toString());
+        log.debug("json is"+json.toString());
         sortbyType(json, memoriesDate, surpriseDate);
         return json;
     }

@@ -19,7 +19,7 @@ public class ScheduledTasks {
 
     //@Scheduled(fixedRate = 90000)
     //Runs Every 6 hrs
-    @Scheduled(cron = "0 0 0/6 * * ?")
+    @Scheduled(cron = "0 0/1 * * * ?")
     public void reportCurrentTime() throws Exception {
         System.out.println("The time is now {}"+ dateFormat.format(new Date()));
         connector.fetchGroups();
