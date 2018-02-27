@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +21,7 @@ import com.appdev.vvish.service.VVishService;
 @Configuration
 public class Vvishcontroller {
 	
-	Logger LOG = LoggerFactory.getLogger(Vvishcontroller.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Vvishcontroller.class);
 	
 	@Autowired
 	VVishService vVService;
@@ -30,28 +29,22 @@ public class Vvishcontroller {
 	@Autowired
 	SMSService smsService;
 	
-	/*@GetMapping(value = "/generate", 
-			produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<String> getUserVideos(@RequestParam String groupId) {
-		return vVService.generateVideo(groupId);
-	}*/
 	@PostMapping(value = "/generateVideo/{userId}/{groupId}", 
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
-	public  List<String> getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody List<String> mediaFiles) throws Exception {
-		vVService.generateMemoriesVideo(groupId, userId, mediaFiles);	
-		return mediaFiles;	
+	public String getUserSelectedVideos(@PathVariable String userId, 
+			@PathVariable String groupId, @RequestBody List<String> mediaFiles) {
+		LOG.info("Generating Memorable Video from the Videos selected..");
+		return vVService.generateMemoriesVideo(groupId, userId, mediaFiles);	
 	}
 	
 	@PostMapping(value = "/generateSurpriseVideo/{userId}/{groupId}", 
 			produces = { MediaType.APPLICATION_JSON_VALUE },
 			consumes = {MediaType.APPLICATION_JSON_VALUE} )
-	public  String getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, @RequestBody Group groupObj) throws Exception {
-		vVService.generateSurpriseVideoFromFinalList(groupId,userId,groupObj);
-		return "Success";	
+	public  String getUserSelectedVideos(@PathVariable String userId, @PathVariable String groupId, 
+			@RequestBody Group groupObj) {
+		return vVService.generateSurpriseVideoFromFinalList(groupId,userId,groupObj);
 	}
-	
-	
 	
 	@PostMapping(value = "/invite",
 			consumes = { MediaType.APPLICATION_JSON_VALUE },

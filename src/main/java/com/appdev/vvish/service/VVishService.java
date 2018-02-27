@@ -1,33 +1,27 @@
 package com.appdev.vvish.service;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.appdev.vvish.constants.VVishConstants;
 import com.appdev.vvish.dao.jersey.DBConnector;
 import com.appdev.vvish.model.Group;
 import com.appdev.vvish.model.Metamember;
-import com.appdev.vvish.service.stitching.Main;
 import com.appdev.vvish.service.stitching.SettingsPath;
-import com.google.api.client.json.Json;
-
 
 @Service
 public class VVishService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(VVishService.class);
+	
 	@Autowired
 	DBConnector dbConnector;
 	@Autowired
@@ -38,105 +32,87 @@ public class VVishService {
 	ImageStitchingService imageStitchingService;
 	@Autowired
 	FirebaseStorage firebaseStorage;
-	final Logger log = LoggerFactory.getLogger(VVishService.class);
 	
-	public String generateSurpriseVideo(String groupId, String userId, List<String> mediaFiles) throws Exception {
+	public String generateSurpriseVideo(String groupId, String userId, List<String> mediaFiles) {
 		String finalUrl = null;
 		try {
 			Arrays.stream(new File("./surprise_media").listFiles()).forEach(File::delete);
 			ArrayList<String> videoFiles = new ArrayList<String>() ;
 			ArrayList<String> imageFiles= new ArrayList<String>() ;
-			segregateVideosImages(mediaFiles, videoFiles, imageFiles);
+
+			//Segregate Video and Image files
+			for(String media: mediaFiles){
+	            String checkStr ="videos";
+	            if(media.toLowerCase().contains(checkStr.toLowerCase())){
+	                videoFiles.add(media);
+	            }else{
+	                imageFiles.add(media);
+	            }
+	        }
+
 			Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
-//			videoStichService.createVideoTextFile(videoFiles);
-//			videoStichService.createImageTextFile(imageFiles);
-//			videoStichService.surpriseFlow("./surprise_media");
-//			
 			
 			//new Code
-			String crd = "./tmp/";
-			System.out.println(new File(crd).getCanonicalPath());
-			crd=new File(crd).getCanonicalPath();
+			String crd = new File("./tmp/").getCanonicalPath();
+			LOG.debug(crd);
+
 			SettingsPath.WIN32_FFMPEG=new File("./lib/ffmpeg.exe").getCanonicalPath();
-			
 			SettingsPath.MENCODER=new File("./lib/mencoder.exe").getCanonicalPath();
-			System.out.println(new File(SettingsPath.WIN32_FFMPEG).exists());
-//			ArrayList<String> videoList = new ArrayList<>();
-//			videoList.add("https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FAcyS4U1uhPZRZTUYAvNv6otUbHH2%2F-L-m224sP1hdzPANjaTp?alt=media&token=32227b95-6bdb-4506-88e5-4920285828b8");
-//			videoList.add("https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FAcyS4U1uhPZRZTUYAvNv6otUbHH2%2F-L-m1brVDmg56feIssOB?alt=media&token=f7773d73-9f07-4d9d-a334-838d6b299d24");
-////			videoList.add("https://firebasestorage.googleapis.com/v0/b/vvish-new.appspot.com/o/videos%2FAcyS4U1uhPZRZTUYAvNv6otUbHH2%2F-L-m1CjXivskZDBv6Kqj?alt=media&token=b9ba3164-dc5c-4ae4-8d16-b54d665a6336");
+			LOG.debug(new File(SettingsPath.WIN32_FFMPEG).exists() + "");
 
 			String path = stitchingService.MergeUrlList(videoFiles);
-			System.out.println("path is"+path);
+			LOG.debug("path is"+path);
 			finalUrl= firebaseStorage.uploadtoStorage(path, groupId, userId);
 			
-		} catch (InterruptedException| IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOG.error("Exception while generating Surprise Video .. ", e);
 		}
 		
 		return finalUrl;
 	}
 
-	private void segregateVideosImages(List<String> mediaFiles, ArrayList<String> videoFiles, ArrayList<String> imageFiles) {
-		log.info("Entered segregateVideosImages");
-
-		for(String media: mediaFiles){
-            String checkStr ="videos";
-            if(media.toLowerCase().contains(checkStr.toLowerCase())){
-                videoFiles.add(media);
-            }else{
-                imageFiles.add(media);
-            }
-        }
-	}
-
-	public String generateMemoriesVideo(String groupId, String userId, List<String> mediaFiles) throws Exception {
+	public String generateMemoriesVideo(String groupId, String userId, List<String> mediaFiles) {
 		String finalUrl = null;
 		try {
 			Arrays.stream(new File("./tmp").listFiles()).forEach(File::delete);
-//			videoStichService.createMediaTextFile(mediaFiles);
-//			videoStichService.memoriesFlow(2);
 			Collections.shuffle(mediaFiles);
 			String path = imageStitchingService.generateImageVideo(mediaFiles);
-			System.out.println("path is"+path);
+			LOG.debug("path is"+path);
 			finalUrl = firebaseStorage.uploadtoStorage(path, groupId, userId);
-			//finalUrl = firebaseStorage.uploadtoStorage("./tmp/img_finalvideo.mp4", groupId, userId);
 
-		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOG.error("Exception while generating Memorable Video .. "+ e);
 		}
 
 		return finalUrl;
 	}
 	
-	public String generateSurpriseVideoFromFinalList(String key, String userKey, Group groupObj) throws Exception {
-		log.info("Entered generateSurpriseVideoFromFinalList");
-		System.out.println("Entered generateSurpriseVideoFromFinalList");
-		String url=generateSurpriseVideo(key, userKey, groupObj.getMediaFiles());
-		return insertUrl(key, userKey, url,groupObj);
+	public String generateSurpriseVideoFromFinalList(String key, String userKey, Group groupObj) {
+		LOG.info("Entered generateSurpriseVideoFromFinalList");
+		String url = generateSurpriseVideo(key, userKey, groupObj.getMediaFiles());
+
+		if(!url.isEmpty()) {
+			return insertUrl(key, userKey, url,groupObj);
+		}
+		
+		return VVishConstants.FAILURE;
 	}
 
-	private String insertUrl(String key, String userKey, String url,Group groupObj) throws ParseException {
-		 JSONParser parser = new JSONParser();
-			
-        
-		//System.out.println("members in group"+groupObj.getMembersGroupId().size());
-		 dbConnector.insertVideoUrl(key, userKey, url, groupObj);
-		for(Metamember member:groupObj.getMembersGroupId()) {
-			
-    		
-	    System.out.println("hey"+member.getUid()+ " and "+ member.getGroupid());
-	    	  if(member.getGroupid() != "" && member.getUid() != "") {
-	    		  System.out.println("inside"+member.getUid()+ " and "+ member.getGroupid() );
-	    		  dbConnector.insertVideoUrl(member.getUid(), member.getGroupid(), url, groupObj);
-	    	  }
-	    	  
+	private String insertUrl(String key, String userKey, String url, Group groupObj) {
+
+		dbConnector.insertVideoUrl(key, userKey, url, groupObj);
+		for (Metamember member : groupObj.getMembersGroupId()) {
+			LOG.info("hey" + member.getUid() + " and " + member.getGroupid());
+			if (member.getGroupid() != "" && member.getUid() != "") {
+				LOG.debug("Inside" + member.getUid() + " and " + member.getGroupid());
+				dbConnector.insertVideoUrl(member.getUid(), member.getGroupid(), url, groupObj);
+			}
 		}
-		return "success";
+		return VVishConstants.SUCCESS;
 	}
 
 	public String generateMemoriesVideoFromFinalList(String key, String userKey, Group groupObj) throws Exception {
-		log.info("Entered generateMemoriesVideoFromFinalList");
+		LOG.info("Entered generateMemoriesVideoFromFinalList");
 		String url=generateMemoriesVideo(key, userKey, groupObj.memoryMedia());
 	
 		return insertUrl(key, userKey, url, groupObj);
