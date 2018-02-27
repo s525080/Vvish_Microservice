@@ -8,4 +8,14 @@ public class VVishConstants {
 	
 	public static final String INVITE = "invite";
 	public static final String VISH = "vish";
+	
+	//Response Statuses
+	public static final String SUCCESS = "SUCCESS";
+	public static final String FAILURE = "FAILURE";
+	
+	//Error Codes
+	public static final String INSERT_CODE = "VVISH_IE007";
+	public static final String CONNECTION_ERROR_CODE = "VVISH_CE007";
+	public static final String PROCESSING_ERROR = "VVISH_PE007";
+	
 }

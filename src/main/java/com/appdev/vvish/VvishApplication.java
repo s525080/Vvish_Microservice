@@ -14,33 +14,22 @@ public class VvishApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(VvishApplication.class);
 
-
-
 	public static void main(String[] args) {
 
-	SpringApplication.run(VvishApplication.class, args);
+		SpringApplication.run(VvishApplication.class, args);
 
-	checkAndCreateDir("./tmp");
-
-	checkAndCreateDir("./surprise_media");
-
+		checkAndCreateDir("./tmp");
+		checkAndCreateDir("./surprise_media");
 	}
-
 
 	public static void checkAndCreateDir(String dirName) {
 
-	File directory = new File(dirName);
+		File directory = new File(dirName);
+		if (!directory.exists()) {
+			directory.mkdirs();
+			LOG.info("Created " + dirName + " directory..");
+		}
 
-	if(!directory.exists()) {
-
-	directory.mkdirs();
-
-	LOG.info("Created "+ dirName + " directory..");
-
-	}
-
-
-	LOG.info(dirName + " directory already exists.");
-
+		LOG.info(dirName + " directory already exists.");
 	}
 }
